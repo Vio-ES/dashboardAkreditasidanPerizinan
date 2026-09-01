@@ -1,4 +1,4 @@
-import type { DashboardData, ModuleData, ModuleDefinition, ModuleRow, PeriodKey, PeriodOption } from "@/types";
+import type { DashboardAsesorData, DashboardData, ModuleData, ModuleDefinition, ModuleRow, PeriodKey, PeriodOption } from "@/types";
 
 // ---- Shared reference lists (ported from the original prototype) ----
 
@@ -225,6 +225,319 @@ export const DASHBOARD_DATA: Record<PeriodKey, DashboardData> = {
       { label: "Sertifikat", value: 3218, pct: null },
     ],
     workload: "8,3",
+  },
+};
+
+// ---- Dashboard Asesor stats per period ----
+
+// ---- Dashboard stats per period (Adjusted to Asesor Dashboard Image) ----
+
+export const DASHBOARD_ASESOR_DATA: Record<PeriodKey, DashboardAsesorData> = {
+  mei2026: {
+    period: "mei2026",
+    label: "Mei 2026",
+    asOfDate: "19 Mei 2026 10:30 WIB",
+    asesorName: "Andi Pratama, ST, M.T.",
+    asesorId: "ASE-2021-0456",
+    
+    totalPenugasanAktif: 18,
+    penugasanDeltaText: "+3 dari minggu lalu",
+    sedangBerproses: 12,
+    sedangBerprosesPct: 66.7,
+    selesai: 6,
+    selesaiPct: 33.3,
+    rataRataSla: 92,
+    slaStatusText: "Sangat Baik",
+    kinerjaAsesmenScore: 4.8,
+    
+    // Beban Kerja Saya (Total 18)
+    bebanKerjaSaya: [
+      { label: "Verifikasi", value: 5, color: COLORS.blue },           // 27.8%
+      { label: "Asesmen", value: 8, color: COLORS.green },             // 44.4%
+      { label: "Review", value: 3, color: COLORS.orange },             // 16.7%
+      { label: "Menunggu Keputusan", value: 2, color: COLORS.purple }, // 11.1%
+    ],
+
+    // Penugasan Berdasarkan Status (Total 18)
+    penugasanStatus: [
+      { label: "Belum Dimulai", value: 2, color: COLORS.blue },         // 11.1%
+      { label: "Sedang Berproses", value: 12, color: COLORS.green },    // 66.7%
+      { label: "Selesai", value: 4, color: COLORS.orange },             // 22.2%
+    ],
+
+    slaGaugePct: 92,
+    slaTerlampauiCount: 2, // "2 dari 18 penugasan"
+    
+    // Tren Kinerja (12 Bulan Terakhir)
+    trendPerformance: [38, 50, 62, 68, 80, 52, 72, 60, 65, 66, 68, 92],
+    trendMonths: TREND_MONTHS,
+    
+    // Kinerja Berdasarkan Dimensi
+    kinerjaDimensi: [
+      { label: "Ketepatan Waktu", score: 4.8 },
+      { label: "Kualitas Asesmen", score: 4.7 },
+      { label: "Profesionalisme", score: 4.9 },
+      { label: "Komunikasi", score: 4.6 },
+      { label: "Integritas", score: 4.9 },
+    ],
+    
+    // Tabel Penugasan Aktif
+    penugasanAktifList: [
+      {
+        no: 1,
+        kodePenugasan: "PNG-2026-00187",
+        lpk: "LPK Mitra Sejahtera",
+        jenisLayanan: "Akreditasi Baru",
+        tahap: "Asesmen",
+        tglPenugasan: "12 Mei 2026",
+        sla: "95%",
+        status: "Sedang Berproses",
+      },
+      {
+        no: 2,
+        kodePenugasan: "PNG-2026-00176",
+        lpk: "LPK Mandiri Jaya",
+        jenisLayanan: "Reakreditasi",
+        tahap: "Verifikasi",
+        tglPenugasan: "10 Mei 2026",
+        sla: "100%",
+        status: "Belum Dimulai",
+      },
+      {
+        no: 3,
+        kodePenugasan: "PNG-2026-00164",
+        lpk: "LPK Nusantara",
+        jenisLayanan: "Penambahan Program",
+        tahap: "Review",
+        tglPenugasan: "08 Mei 2026",
+        sla: "88%",
+        status: "Sedang Berproses",
+      },
+      {
+        no: 4,
+        kodePenugasan: "PNG-2026-00155",
+        lpk: "LPK Cipta Karya",
+        jenisLayanan: "Akreditasi Baru",
+        tahap: "Asesmen",
+        tglPenugasan: "07 Mei 2026",
+        sla: "90%",
+        status: "Sedang Berproses",
+      },
+      {
+        no: 5,
+        kodePenugasan: "PNG-2026-00144",
+        lpk: "LPK Prima Vokasi",
+        jenisLayanan: "Reakreditasi",
+        tahap: "Menunggu Keputusan",
+        tglPenugasan: "05 Mei 2026",
+        sla: "100%",
+        status: "Selesai",
+      },
+    ],
+    
+    // Kalender Agenda
+    agendaList: [
+      {
+        id: 1,
+        date: "2026-05-20",
+        time: "09:00 - 15:00 WIB",
+        title: "Asesmen LPK Mitra Sejahtera",
+        category: "Asesmen",
+      },
+      {
+        id: 2,
+        date: "2026-05-21",
+        time: "09:00 - 12:00 WIB",
+        title: "Review Akreditasi LPK Mandiri Jaya",
+        category: "Review",
+      },
+    ],
+    
+    
+  },
+
+  apr2026: {
+    period: "apr2026",
+    label: "April 2026",
+    asOfDate: "30 April 2026 17:00 WIB",
+    asesorName: "Andi Pratama, ST, M.T.",
+    asesorId: "ASE-2021-0456",
+    totalPenugasanAktif: 15,
+    penugasanDeltaText: "+2 dari minggu lalu",
+    sedangBerproses: 10,
+    sedangBerprosesPct: 66.7,
+    selesai: 5,
+    selesaiPct: 33.3,
+    rataRataSla: 90,
+    slaStatusText: "Baik",
+    kinerjaAsesmenScore: 4.7,
+    bebanKerjaSaya: [
+      { label: "Verifikasi", value: 4, color: COLORS.blue },
+      { label: "Asesmen", value: 7, color: COLORS.green },
+      { label: "Review", value: 2, color: COLORS.orange },
+      { label: "Menunggu Keputusan", value: 2, color: COLORS.purple },
+    ],
+    penugasanStatus: [
+      { label: "Belum Dimulai", value: 2, color: COLORS.blue },
+      { label: "Sedang Berproses", value: 10, color: COLORS.green },
+      { label: "Selesai", value: 3, color: COLORS.orange },
+    ],
+    slaGaugePct: 90,
+    slaTerlampauiCount: 3,
+    trendPerformance: [38, 50, 62, 68, 80, 52, 72, 60, 65, 66, 68, 68],
+    trendMonths: TREND_MONTHS,
+    kinerjaDimensi: [
+      { label: "Ketepatan Waktu", score: 4.7 },
+      { label: "Kualitas Asesmen", score: 4.6 },
+      { label: "Profesionalisme", score: 4.8 },
+      { label: "Komunikasi", score: 4.5 },
+      { label: "Integritas", score: 4.9 },
+    ],
+    penugasanAktifList: [],
+    agendaList: [{
+    id: 1,
+    date: '2026-08-31',
+    time: '09:00 - 10:00',
+    title: 'Daily Standup Teknik',
+    category: "Review",
+    },
+    {
+      id: 2,
+      date: '2026-08-31',
+      time: '14:00 - 15:30',
+      title: 'Code Review PR #42',
+      category: "Asesmen",
+    },
+    {
+      id: 3,
+      date: '2026-09-01',
+      time: '10:00 - 11:30',
+      title: 'Planning Feature Dashboard',
+      category: "Verifikasi",
+    },],
+  },
+
+  mar2026: {
+    period: "mar2026",
+    label: "Maret 2026",
+    asOfDate: "31 Maret 2026 16:00 WIB",
+    asesorName: "Andi Pratama, ST, M.T.",
+    asesorId: "ASE-2021-0456",
+    totalPenugasanAktif: 13,
+    penugasanDeltaText: "+1 dari minggu lalu",
+    sedangBerproses: 9,
+    sedangBerprosesPct: 69.2,
+    selesai: 4,
+    selesaiPct: 30.8,
+    rataRataSla: 88,
+    slaStatusText: "Cukup Baik",
+    kinerjaAsesmenScore: 4.6,
+    bebanKerjaSaya: [
+      { label: "Verifikasi", value: 3, color: COLORS.blue },
+      { label: "Asesmen", value: 6, color: COLORS.green },
+      { label: "Review", value: 2, color: COLORS.orange },
+      { label: "Menunggu Keputusan", value: 2, color: COLORS.purple },
+    ],
+    penugasanStatus: [
+      { label: "Belum Dimulai", value: 1, color: COLORS.blue },
+      { label: "Sedang Berproses", value: 9, color: COLORS.green },
+      { label: "Selesai", value: 3, color: COLORS.orange },
+    ],
+    slaGaugePct: 88,
+    slaTerlampauiCount: 4,
+    trendPerformance: [38, 50, 62, 68, 80, 52, 72, 60, 65, 66, 66, 66],
+    trendMonths: TREND_MONTHS,
+    kinerjaDimensi: [
+      { label: "Ketepatan Waktu", score: 4.6 },
+      { label: "Kualitas Asesmen", score: 4.5 },
+      { label: "Profesionalisme", score: 4.7 },
+      { label: "Komunikasi", score: 4.5 },
+      { label: "Integritas", score: 4.8 },
+    ],
+    penugasanAktifList: [],
+    agendaList: [],
+  },
+
+  q2026: {
+    period: "q2026",
+    label: "Kuartal I 2026",
+    asOfDate: "31 Maret 2026 · Kumulatif Kuartal I",
+    asesorName: "Andi Pratama, ST, M.T.",
+    asesorId: "ASE-2021-0456",
+    totalPenugasanAktif: 35,
+    penugasanDeltaText: "+5 dari kuartal lalu",
+    sedangBerproses: 23,
+    sedangBerprosesPct: 65.7,
+    selesai: 12,
+    selesaiPct: 34.3,
+    rataRataSla: 89,
+    slaStatusText: "Baik",
+    kinerjaAsesmenScore: 4.65,
+    bebanKerjaSaya: [
+      { label: "Verifikasi", value: 9, color: COLORS.blue },
+      { label: "Asesmen", value: 16, color: COLORS.green },
+      { label: "Review", value: 6, color: COLORS.orange },
+      { label: "Menunggu Keputusan", value: 4, color: COLORS.purple },
+    ],
+    penugasanStatus: [
+      { label: "Belum Dimulai", value: 4, color: COLORS.blue },
+      { label: "Sedang Berproses", value: 23, color: COLORS.green },
+      { label: "Selesai", value: 8, color: COLORS.orange },
+    ],
+    slaGaugePct: 89,
+    slaTerlampauiCount: 8,
+    trendPerformance: [38, 50, 62, 68, 80, 52, 72, 60, 65, 66, 66, 66],
+    trendMonths: TREND_MONTHS,
+    kinerjaDimensi: [
+      { label: "Ketepatan Waktu", score: 4.65 },
+      { label: "Kualitas Asesmen", score: 4.55 },
+      { label: "Profesionalisme", score: 4.75 },
+      { label: "Komunikasi", score: 4.5 },
+      { label: "Integritas", score: 4.85 },
+    ],
+    penugasanAktifList: [],
+    agendaList: [],
+  },
+
+  y2026: {
+    period: "y2026",
+    label: "Tahun 2026 (s.d. Mei)",
+    asOfDate: "19 Mei 2026 · Kumulatif Tahun Berjalan",
+    asesorName: "Andi Pratama, ST, M.T.",
+    asesorId: "ASE-2021-0456",
+    totalPenugasanAktif: 46,
+    penugasanDeltaText: "+8 dari tahun lalu",
+    sedangBerproses: 29,
+    sedangBerprosesPct: 63.0,
+    selesai: 17,
+    selesaiPct: 37.0,
+    rataRataSla: 91,
+    slaStatusText: "Sangat Baik",
+    kinerjaAsesmenScore: 4.75,
+    bebanKerjaSaya: [
+      { label: "Verifikasi", value: 12, color: COLORS.blue },
+      { label: "Asesmen", value: 21, color: COLORS.green },
+      { label: "Review", value: 8, color: COLORS.orange },
+      { label: "Menunggu Keputusan", value: 5, color: COLORS.purple },
+    ],
+    penugasanStatus: [
+      { label: "Belum Dimulai", value: 5, color: COLORS.blue },
+      { label: "Sedang Berproses", value: 29, color: COLORS.green },
+      { label: "Selesai", value: 12, color: COLORS.orange },
+    ],
+    slaGaugePct: 91,
+    slaTerlampauiCount: 5,
+    trendPerformance: [38, 50, 62, 68, 80, 52, 72, 60, 65, 66, 68, 92],
+    trendMonths: TREND_MONTHS,
+    kinerjaDimensi: [
+      { label: "Ketepatan Waktu", score: 4.75 },
+      { label: "Kualitas Asesmen", score: 4.65 },
+      { label: "Profesionalisme", score: 4.85 },
+      { label: "Komunikasi", score: 4.55 },
+      { label: "Integritas", score: 4.9 },
+    ],
+    penugasanAktifList: [],
+    agendaList: [],
   },
 };
 

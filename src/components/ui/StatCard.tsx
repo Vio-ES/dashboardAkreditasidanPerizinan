@@ -6,7 +6,7 @@ interface StatCardProps {
   icon: LucideIcon;
   label: string;
   value: number;
-  delta?: number;
+  delta?: number | string;
   note?: string;
   accent?: "blue" | "green" | "orange" | "purple" | "teal";
 }
@@ -30,6 +30,11 @@ export function StatCard({ icon: Icon, label, value, delta, note, accent = "blue
           <span className="inline-flex items-center gap-1 text-xs font-semibold text-green">
             <TrendingUp size={13} />
             {delta}%
+          </span>
+        )}
+        {typeof delta === "string" && (
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-green">
+            {delta}
           </span>
         )}
       </div>

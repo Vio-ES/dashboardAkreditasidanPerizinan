@@ -21,15 +21,23 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 px-3 pb-5 pt-3.5">
-          <div tabIndex={0} className="collapse collapse-arrow bg-base-100 border-base-300 border">
-            <div className="collapse-title font-semibold">
-              hi
-            </div>
-          <div className="collapse-content text-sm">
-            test
-          </div>
-        </div>
-        <NavItem to="/" label="Dashboard" icon={LayoutDashboard} end />
+
+        <ul className="menu bg-base-200 rounded-box w-56">
+          <li>
+            <details open>
+              <summary>Dashboard</summary>
+              <ul>
+                <li>
+                  <NavItem to="/" label="Dashboard" icon={LayoutDashboard} end />
+                </li>
+                <li>
+                  <NavItem to="/dashboardassesor" label="Dashboard Assesor" icon={LayoutDashboard} end />
+                </li>
+              </ul>
+            </details>
+          </li>
+        </ul>
+        
         <div className="mb-2 mt-4 px-2.5 text-[10.5px] font-bold uppercase tracking-wider text-[#5c6fa0]">
           Modul
         </div>

@@ -1,5 +1,5 @@
-import type { DashboardData, Notification, PeriodKey } from "@/types";
-import { DASHBOARD_DATA } from "@/data/staticData";
+import type { DashboardAsesorData, DashboardData, Notification, PeriodKey } from "@/types";
+import { DASHBOARD_ASESOR_DATA, DASHBOARD_DATA } from "@/data/staticData";
 
 // --- THE SWAP POINT ---
 // Right now this returns seeded mock data. When your backend is ready,
@@ -16,6 +16,13 @@ const SIMULATED_LATENCY_MS = 300;
 export async function fetchDashboardData(period: PeriodKey): Promise<DashboardData> {
   await delay(SIMULATED_LATENCY_MS);
   const data = DASHBOARD_DATA[period];
+  if (!data) throw new Error(`Unknown period: ${period}`);
+  return data;
+}
+
+export async function fetchDashboardAsesorData(period: PeriodKey): Promise<DashboardAsesorData> {
+  await delay(SIMULATED_LATENCY_MS);
+  const data = DASHBOARD_ASESOR_DATA[period];
   if (!data) throw new Error(`Unknown period: ${period}`);
   return data;
 }

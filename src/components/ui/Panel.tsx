@@ -13,7 +13,7 @@ export function Panel({
   children: ReactNode;
 }) {
   return (
-    <div className={`rounded-card bg-white p-5 shadow-card ${center ? "flex flex-col items-center" : ""}`}>
+    <div className={`rounded-card bg-white p-5 shadow-card ${center ? "flex flex-col items-center" : "w-full"}`}>
       <div className="mb-4 w-full text-sm font-bold text-ink">{title}</div>
       <div className="w-full">{children}</div>
       {onMore && (

@@ -58,6 +58,83 @@ export interface DashboardData {
   workload: string;
 }
 
+// --- Tipe Data Tabel Penugasan Aktif Asesor ---
+export interface PenugasanItem {
+  no: number;
+  kodePenugasan: string;
+  lpk: string;
+  jenisLayanan: "Akreditasi Baru" | "Reakreditasi" | "Penambahan Program";
+  tahap: "Verifikasi" | "Asesmen" | "Review" | "Menunggu Keputusan";
+  tglPenugasan: string;
+  sla: string;
+  status: "Belum Dimulai" | "Sedang Berproses" | "Selesai";
+}
+
+// --- Tipe Data Agenda Kalender Asesor ---
+export interface AgendaItem {
+  id: number;
+  date: string; // YYYY-MM-DD
+  time: string;
+  title: string;
+  category: "Asesmen" | "Review" | "Verifikasi";
+}
+
+export interface AgendaListProps {
+  currentDate: Date;
+  selectedDate: Date | null;
+  events: AgendaItem[];
+}
+
+export interface CalendarProps {
+  currentDate: Date;
+  onMonthChange: (date: Date) => void;
+  selectedDate: Date | null;
+  onSelectDate: (date: Date | null) => void;
+}
+
+// --- Tipe Data Dimensi Kinerja Asesor ---
+export interface KinerjaDimensi {
+  label: string;
+  score: number; // e.g., 4.8
+}
+
+// --- Dashboard Data Khusus Asesor (Selaras dengan Gambar) ---
+export interface DashboardAsesorData {
+  period: PeriodKey;
+  label: string;
+  asOfDate: string;
+  
+  // Header / Profil Info
+  asesorName: string;
+  asesorId: string;
+  
+  // Top Stats
+  totalPenugasanAktif: number;
+  penugasanDeltaText: string;
+  sedangBerproses: number;
+  sedangBerprosesPct: number;
+  selesai: number;
+  selesaiPct: number;
+  rataRataSla: number;
+  slaStatusText: string;
+  kinerjaAsesmenScore: number; // e.g., 4.8
+  
+  // Charts
+  bebanKerjaSaya: ChartSlice[];
+  penugasanStatus: ChartSlice[];
+  slaGaugePct: number;
+  slaTerlampauiCount: number;
+  
+  // Tren & Dimensi Kinerja
+  trendPerformance: number[];
+  trendMonths: string[];
+  kinerjaDimensi: KinerjaDimensi[];
+  
+  // Widgets Data
+  penugasanAktifList: PenugasanItem[];
+  agendaList: AgendaItem[];
+}
+
 export interface Notification {
   id: string;
   title: string;
