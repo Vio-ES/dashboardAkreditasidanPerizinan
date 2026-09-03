@@ -60,26 +60,59 @@ export function DashboardAssesorPage() {
 
         <div className="grid grid-cols-1 gap-4">
           {/* Donuts + gauge */}
-          <div className="col-span-1 row-start-1 flex gap-4">
-            <Panel title="Pengajuan Berdasarkan Jenis Layanan" onMore={() => navigate("/modul/mod-pengajuan")}>
+          <div className="row-start-1 flex gap-4">
+            <Panel title="Beban Kerja Saya" onMore={() => navigate("/modul/mod-pengajuan")}>
               <DonutChart data={data.bebanKerjaSaya} total={data.totalPenugasanAktif} />
             </Panel>
-            <Panel title="Status Pengajuan" onMore={() => navigate("/modul/mod-verifikasi")}>
+            <Panel title="Penugasan Berdasarkan Status" onMore={() => navigate("/modul/mod-verifikasi")}>
               <DonutChart data={data.penugasanStatus} total={data.totalPenugasanAktif} />
             </Panel>
-            <Panel title="SLA Pengajuan" onMore={() => navigate("/modul/mod-monitoring")} center>
+            <Panel title="SLA Pengajuan Saya" onMore={() => navigate("/modul/mod-monitoring")} center>
               <GaugeChart pct={data.slaGaugePct} />
               <div className="mt-2 text-center text-xs text-ink-faint">
                 SLA Terlampaui <b className="text-ink">{fmt(data.slaTerlampauiCount)}</b> dari {fmt(data.totalPenugasanAktif)}
               </div>
             </Panel>
           </div>
+
+          {/* Table */}
+          <div className="row-start-2 overflow-x-auto h-fit rounded-box border border-base-50 bg-base-200">
+          <table className="table table-xs">
+              <thead>
+                <tr className="font-bold text-primary">
+                  <th>No.</th>
+                  <th>Kode Penugasan</th>
+                  <th>LPK</th>
+                  <th>Jenis Layanan</th>
+                  <th>Tahap</th>
+                  <th>Tgl. Penugasan</th>
+                  <th>SLA</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.penugasanAktifList.map((penugasanAktif) => (
+                  <tr key={penugasanAktif.no} className="hover:bg-neutral-content">
+                    <th>{penugasanAktif.no}</th>
+                    <th>{penugasanAktif.kodePenugasan}</th>
+                    <th>{penugasanAktif.lpk}</th>
+                    <th>{penugasanAktif.jenisLayanan}</th>
+                    <th>{penugasanAktif.tahap}</th>
+                    <th>{penugasanAktif.tglPenugasan}</th>
+                    <th>{penugasanAktif.sla}</th>
+                    <th>{penugasanAktif.status}</th>
+                  </tr>
+                ))}
+              </tbody>
+          </table>
+        </div>
+
           {/* Trend*/}
-          <div className="col-span-1 row-start-2 flex gap-4">
-            <Panel title="Tren Pengajuan (12 Bulan Terakhir)">
+          <div className="row-start-3 flex gap-4">
+            <Panel title="Tren Kinerja (12 Bulan Terakhir)">
               <TrendChart values={data.trendPerformance} months={data.trendMonths} />
             </Panel>
-            <Panel title="Top 5 Provinsi — Pengajuan Terbanyak" onMore={() => navigate("/modul/mod-laporan")}>
+            <Panel title="Kinerja Berdasarkan Dimensi" onMore={() => navigate("/modul/mod-laporan")}>
               <div className="space-y-3">
                 {data.kinerjaDimensi.map((p, i) => (
                   <div key={p.label} className="flex items-center gap-3">
@@ -97,7 +130,9 @@ export function DashboardAssesorPage() {
               </div>
             </Panel>
           </div>
-          <div className="col-start-2 row-span-2 w-fit space-y-4">
+
+          {/* Calendar and Agenda */}
+          <div className="col-start-2 row-span-3 h-full w-fit space-y-4">
             <Calendar
             currentDate={currentDate}
             onMonthChange={setCurrentDate}
