@@ -25,9 +25,9 @@ export function StatCard({ icon: Icon, label, value, delta, note, accent = "blue
   const DeltaIcon = isNegative ? TrendingDown : TrendingUp;
   
   return (
-    <div className="rounded-card bg-card p-5 shadow-card h-auto min-h-24">
+    <div className="rounded-card bg-card p-5 shadow-card h-auto min-h-24 w-[132px] md:w-auto flex-shrink-0 snap-start">
       <div className="flex items-start justify-between">
-        <div className={cn("flex items-center justify-center rounded-xl p-3", ACCENT_BG[accent])}>
+        <div className={cn("hidden md:flex items-center justify-center rounded-xl p-3", ACCENT_BG[accent])}>
           <Icon size={20} strokeWidth={2} />
         </div>
         {typeof delta === "number" && (

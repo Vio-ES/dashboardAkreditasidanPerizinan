@@ -37,7 +37,7 @@ export function DashboardPage() {
 
       <div className="flex-1 space-y-6 p-6">
         {/* Stat cards */}
-        <div className="flex overflow-x-auto gap-2.5 scroll-snap-type: x mandatory md:grid grid-cols-1 md:gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="flex overflow-x-auto gap-2.5 snap-x snap-mandatory lg:grid lg:gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard icon={Building2} label="Total LPK Terdaftar" value={data.lpk} delta={data.lpkDelta} accent="blue" />
           <StatCard icon={FileStack} label="Total Akreditasi" value={data.akreditasi} delta={data.akreditasiDelta} accent="green" />
           <StatCard icon={FileCheck2} label="Pengajuan Aktif" value={data.aktif} delta={data.aktifDelta} accent="orange" />
@@ -52,7 +52,7 @@ export function DashboardPage() {
         </div>
 
         {/* Donuts + gauge */}
-        <div className="flex overflow-x-auto gap-2.5 scroll-snap-type: x mandatory md:grid grid-cols-1 md:gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="flex flex-col gap-4 md:grid md:grid-cols-2 xl:grid-cols-4">
           <Panel title="Pengajuan Berdasarkan Jenis Layanan" onMore={() => navigate("/modul/mod-pengajuan")}>
             <DonutChart data={data.jenis} total={data.aktif} />
           </Panel>
@@ -97,20 +97,19 @@ export function DashboardPage() {
         {/* Process summary + side cards */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <Panel title="Ringkasan Proses Akreditasi">
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col divide-y divide-line md:flex-row md:flex-wrap md:gap-3 md:divide-y-0">
               {data.process.map((step) => (
-                <div key={step.label} className="min-w-[120px] flex-1 rounded-xl bg-surface p-3">
+                <div key={step.label} className="flex items-center gap-3 py-2.5 md:min-w-[120px] md:flex-1 md:flex-col md:items-start md:rounded-xl md:bg-surface md:p-3 md:py-3">
                   <div className="text-lg font-extrabold text-ink">{fmt(step.value)}</div>
                   <div className="text-xs text-ink-soft">{step.label}</div>
-                  {step.pct !== null && <div className="mt-1 text-[11px] font-semibold text-blue">{step.pct}%</div>}
+                  {step.pct !== null && <div className="text-[11px] font-semibold text-blue md:mt-1">{step.pct}%</div>}
                 </div>
               ))}
             </div>
           </Panel>
 
           <div className="space-y-4">
-            <div className="rounded-card bg-card p-4 shadow-card">
-              <div className="mb-3 text-sm font-bold text-ink">Beban Kerja Asesor</div>
+            <Panel title="Beban Kerja Asesor">
               <div className="flex items-center gap-4">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-bg text-purple">
                   <Users2 size={20} />
@@ -120,13 +119,9 @@ export function DashboardPage() {
                   <div className="text-xs text-ink-faint">Rata-rata Per Asesor · Pengajuan Aktif</div>
                 </div>
               </div>
-            </div>
+            </Panel>
 
-            <div className="rounded-card bg-card p-4 shadow-card">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="text-sm font-bold text-ink">Notifikasi</div>
-                <Bell size={16} className="text-ink-faint" />
-              </div>
+            <Panel title="Notifikasi">
               <div className="space-y-2">
                 {notifications?.slice(0, 3).map((n) => (
                   <div key={n.id} className="flex items-start gap-2 text-xs">
@@ -138,7 +133,7 @@ export function DashboardPage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </Panel>
           </div>
         </div>
 
