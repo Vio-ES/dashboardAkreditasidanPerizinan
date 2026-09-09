@@ -1,65 +1,110 @@
 import { NavLink } from "react-router-dom";
 import * as Icons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, X } from "lucide-react";
 import { useModuleDefinitions } from "@/hooks/useModuleData";
 import { fmt, cn } from "@/lib/utils";
+import { useEffect, useRef } from "react";
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { data: modules } = useModuleDefinitions();
 
+  const sidebarRef = useRef<HTMLDivElement>(null);
+
+  // Auto-close on resize to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) onClose();
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [onClose]);
+
+  // Close on click outside (mobile only)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen, onClose]);
+
   return (
-    <aside className="sticky top-0 flex h-screen w-[250px] flex-shrink-0 flex-col overflow-y-auto bg-gradient-to-b from-navy to-[#0a1630] text-[#cdd6ec]">
-      <div className="flex items-center gap-2.5 border-b border-white/10 px-[18px] py-5">
-        <div className="flex h-[38px] w-[38px] flex-shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#4c7bff] to-[#2447a8] shadow-[0_4px_10px_rgba(47,111,237,.35)]">
-          <LayoutDashboard size={19} className="text-white" />
-        </div>
-        <div>
-          <div className="text-[15.5px] font-extrabold leading-tight text-white">SI-LEMLATVOK</div>
-          <div className="mt-0.5 text-[10.5px] text-[#8fa0cc]">Sistem Akreditasi Lembaga Vokasi</div>
-        </div>
-      </div>
+    <>
+      {isOpen && <div className="fixed inset-0 bg-black/40 z-20 lg:hidden" />}
 
-      <nav className="flex-1 px-3 pb-5 pt-3.5">
-
-        <ul className="menu bg-base-200 rounded-box w-56">
-          <li>
-            <details open>
-              <summary>Dashboard</summary>
-              <ul>
-                <li>
-                  <NavItem to="/" label="Dashboard" icon={LayoutDashboard} end />
-                </li>
-                <li>
-                  <NavItem to="/dashboardassesor" label="Dashboard Assesor" icon={LayoutDashboard} end />
-                </li>
-              </ul>
-            </details>
-          </li>
-        </ul>
-        
-        <div className="mb-2 mt-4 px-2.5 text-[10.5px] font-bold uppercase tracking-wider text-[#5c6fa0]">
-          Modul
+      <aside 
+      ref={sidebarRef}
+      className={`fixed lg:sticky top-0 z-30 flex h-full w-[250px] flex-shrink-0 flex-col overflow-y-auto bg-gradient-to-b from-navy to-[#0a1630] text-[#cdd6ec] transform transition-transform duration-300
+      ${isOpen ? "translate-x-0" : "-translate-x-full"}
+      lg:translate-x-0`}>
+        <div className="flex items-center gap-2.5 border-b border-white/10 px-[18px] py-5">
+          <div className="flex h-[38px] w-[38px] flex-shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#4c7bff] to-[#2447a8] shadow-[0_4px_10px_rgba(47,111,237,.35)]">
+            <LayoutDashboard size={19} className="text-white" />
+          </div>
+          <div>
+            <div className="text-[15.5px] font-extrabold leading-tight text-white">SI-LEMLATVOK</div>
+            <div className="mt-0.5 text-[10.5px] text-[#8fa0cc]">Sistem Akreditasi Lembaga Vokasi</div>
+          </div>
+          <div className="p-4 flex justify-end md:hidden">
+          <button onClick={onClose}>
+            <X size={20} />
+          </button>
         </div>
-        {modules?.map((m) => {
-          const Icon = (Icons[m.icon as keyof typeof Icons] as LucideIcon) ?? Icons.Circle;
-          return (
-            <NavItem
-              key={m.key}
-              to={`/modul/${m.key}`}
-              label={m.navLabel}
-              icon={Icon}
-              badge={m.showBadge ? m.count : undefined}
-            />
-          );
-        })}
-      </nav>
+        </div>
 
-      <div className="border-t border-white/10 px-[18px] py-4 text-[11px] leading-relaxed text-[#5c6fa0]">
-        SI-LEMLATVOK v2.4.0
-        <br />© 2026 Kementerian Ketenagakerjaan RI
-      </div>
-    </aside>
+        <nav className="flex-1 px-3 pb-5 pt-3.5">
+
+          <ul className="menu bg-base-200 rounded-box w-56">
+            <li>
+              <details open>
+                <summary>Dashboard</summary>
+                <ul>
+                  <li>
+                    <NavItem to="/" label="Dashboard" icon={LayoutDashboard} end />
+                  </li>
+                  <li>
+                    <NavItem to="/dashboardassesor" label="Dashboard Assesor" icon={LayoutDashboard} end />
+                  </li>
+                </ul>
+              </details>
+            </li>
+          </ul>
+          
+          <div className="mb-2 mt-4 px-2.5 text-[10.5px] font-bold uppercase tracking-wider text-[#5c6fa0]">
+            Modul
+          </div>
+          {modules?.map((m) => {
+            const Icon = (Icons[m.icon as keyof typeof Icons] as LucideIcon) ?? Icons.Circle;
+            return (
+              <NavItem
+                key={m.key}
+                to={`/modul/${m.key}`}
+                label={m.navLabel}
+                icon={Icon}
+                badge={m.showBadge ? m.count : undefined}
+              />
+            );
+          })}
+        </nav>
+
+        <div className="border-t border-white/10 px-[18px] py-4 text-[11px] leading-relaxed text-[#5c6fa0]">
+          SI-LEMLATVOK v2.4.0
+          <br />© 2026 Kementerian Ketenagakerjaan RI
+        </div>
+      </aside>
+    </>
+
   );
 }
 
