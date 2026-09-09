@@ -61,10 +61,10 @@ export function DashboardAssesorPage() {
         <div className="grid grid-cols-1 gap-4">
           {/* Donuts + gauge */}
           <div className="row-start-1 flex gap-4">
-            <Panel title="Beban Kerja Saya" onMore={() => navigate("/modul/mod-pengajuan")}>
+            <Panel title="Beban Kerja Saya" onMore={() => navigate("/modul/mod-verifikasi")}>
               <DonutChart data={data.bebanKerjaSaya} total={data.totalPenugasanAktif} />
             </Panel>
-            <Panel title="Penugasan Berdasarkan Status" onMore={() => navigate("/modul/mod-verifikasi")}>
+            <Panel title="Penugasan Berdasarkan Status" onMore={() => navigate("/modul/mod-penugasan")}>
               <DonutChart data={data.penugasanStatus} total={data.totalPenugasanAktif} />
             </Panel>
             <Panel title="SLA Pengajuan Saya" onMore={() => navigate("/modul/mod-monitoring")} center>
@@ -76,10 +76,10 @@ export function DashboardAssesorPage() {
           </div>
 
           {/* Table */}
-          <div className="row-start-2 overflow-x-auto h-fit rounded-box border border-base-50 bg-base-200">
+          <div className="row-start-2 overflow-x-auto h-fit rounded-card shadow-card bg-white p-4">
           <table className="table table-xs">
               <thead>
-                <tr className="font-bold text-primary">
+                <tr className="text-ink">
                   <th>No.</th>
                   <th>Kode Penugasan</th>
                   <th>LPK</th>
