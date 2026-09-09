@@ -37,7 +37,7 @@ export function DashboardPage() {
 
       <div className="flex-1 space-y-6 p-6">
         {/* Stat cards */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="flex overflow-x-auto gap-2.5 scroll-snap-type: x mandatory md:grid grid-cols-1 md:gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard icon={Building2} label="Total LPK Terdaftar" value={data.lpk} delta={data.lpkDelta} accent="blue" />
           <StatCard icon={FileStack} label="Total Akreditasi" value={data.akreditasi} delta={data.akreditasiDelta} accent="green" />
           <StatCard icon={FileCheck2} label="Pengajuan Aktif" value={data.aktif} delta={data.aktifDelta} accent="orange" />
@@ -52,7 +52,7 @@ export function DashboardPage() {
         </div>
 
         {/* Donuts + gauge */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="flex overflow-x-auto gap-2.5 scroll-snap-type: x mandatory md:grid grid-cols-1 md:gap-4 md:grid-cols-2 xl:grid-cols-4">
           <Panel title="Pengajuan Berdasarkan Jenis Layanan" onMore={() => navigate("/modul/mod-pengajuan")}>
             <DonutChart data={data.jenis} total={data.aktif} />
           </Panel>

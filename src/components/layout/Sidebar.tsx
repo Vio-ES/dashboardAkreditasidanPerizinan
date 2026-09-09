@@ -45,7 +45,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       <aside 
       ref={sidebarRef}
-      className={`fixed lg:sticky top-0 z-30 flex h-full w-[250px] flex-shrink-0 flex-col overflow-y-auto bg-gradient-to-b from-navy to-[#0a1630] text-[#cdd6ec] transform transition-transform duration-300
+      className={`fixed lg:sticky top-0 z-30 flex h-dvh w-[250px] flex-shrink-0 flex-col overflow-y-auto bg-gradient-to-b from-navy to-[#0a1630] text-[#cdd6ec] transform transition-transform duration-300
       ${isOpen ? "translate-x-0" : "-translate-x-full"}
       lg:translate-x-0`}>
         <div className="flex items-center gap-2.5 border-b border-white/10 px-[18px] py-5">

@@ -41,7 +41,7 @@ export function Calendar({ currentDate, selectedDate, onMonthChange, onSelectDat
 
         // Slot kosong sebelum tanggal 1
         for (let i = 0; i < firstDayOfMonth; i++) {
-        days.push(<div key={`empty-${i}`} className="h-10 w-10" />);
+        days.push(<div key={`empty-${i}`} className="aspect-square w-full" />);
         }
 
         // Tanggal bulan berjalan
@@ -62,7 +62,7 @@ export function Calendar({ currentDate, selectedDate, onMonthChange, onSelectDat
             <button
             key={day}
             onClick={() => onSelectDate(new Date(year, month, day))}
-            className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors
+            className={`aspect-square w-full max-w-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors
                 ${isSelected ? 'bg-indigo-600 text-white font-bold' : ''}
                 ${!isSelected && isToday ? 'border-2 border-indigo-600 text-indigo-600' : ''}
                 ${!isSelected && !isToday ? 'hover:bg-slate-100 text-slate-700' : ''}
@@ -82,7 +82,7 @@ export function Calendar({ currentDate, selectedDate, onMonthChange, onSelectDat
     ];
 
     return (
-        <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-lg border border-slate-100">
+        <div className="w-full max-w-md mx-auto p-3 sm:p-6 bg-white rounded-2xl">
         {/* Header: Month/Year & Navigation */}
         <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-bold text-slate-800">

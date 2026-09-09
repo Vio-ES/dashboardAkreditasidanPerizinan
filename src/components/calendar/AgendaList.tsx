@@ -39,9 +39,9 @@ export function AgendaList( {currentDate, selectedDate, events} : AgendaListProp
   });
 
   return (
-    <div className="space-y-6 w-full max-w-md">
+    <div className="space-y-3 sm:space-y-6">
       {/* SECTION 1: AGENDA HARI INI (TANGGAL PILIHAN) */}
-      <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100">
+      <div className="w-full max-w-md mx-auto bg-white rounded-2xl p-4 sm:p-6">
         <div className="border-b border-slate-100 pb-3 mb-4">
           <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600">
             Agenda Harian
@@ -73,8 +73,8 @@ export function AgendaList( {currentDate, selectedDate, events} : AgendaListProp
       </div>
 
       {/* SECTION 2: OVERVIEW AGENDA BULANAN */}
-      <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100">
-        <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+      <div className=" w-full max-w-md mx-auto bg-white rounded-2xl p-4 sm:p-6">
+        <div className="flex-1 justify-between items-center border-b border-slate-100 pb-3 mb-4">
           <div>
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
               Overview Ringkas
@@ -90,7 +90,7 @@ export function AgendaList( {currentDate, selectedDate, events} : AgendaListProp
           <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
             {monthlyEvents.map((item) => (
               <div key={item.id} className="flex justify-between items-center text-xs p-2 rounded-lg hover:bg-slate-50">
-                <span className="font-medium text-slate-700 truncate max-w-[200px]">{item.title}</span>
+                <span className="font-medium text-slate-700 truncate flex-1 mr-2 min-w-0">{item.title}</span>
                 <span className="text-slate-400 font-mono">{item.date}</span>
               </div>
             ))}
