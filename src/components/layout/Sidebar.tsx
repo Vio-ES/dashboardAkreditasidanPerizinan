@@ -52,11 +52,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <div className="flex h-[38px] w-[38px] flex-shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#4c7bff] to-[#2447a8] shadow-[0_4px_10px_rgba(47,111,237,.35)]">
             <LayoutDashboard size={19} className="text-white" />
           </div>
-          <div>
-            <div className="text-[15.5px] font-extrabold leading-tight text-white">SI-LEMLATVOK</div>
-            <div className="mt-0.5 text-[10.5px] text-[#8fa0cc]">Sistem Akreditasi Lembaga Vokasi</div>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[15.5px] font-extrabold leading-tight text-white">SI-LEMLATVOK</div>
+            <div className="mt-0.5 truncate text-[10.5px] text-[#8fa0cc]">Sistem Akreditasi Lembaga Vokasi</div>
           </div>
-          <div className="p-4 flex justify-end md:hidden">
+          <div className="flex-shrink-0 p-1 text-white md:hidden">
           <button onClick={onClose}>
             <X size={20} />
           </button>

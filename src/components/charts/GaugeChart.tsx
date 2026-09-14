@@ -12,7 +12,7 @@ export function GaugeChart({ pct }: GaugeChartProps) {
   const color = pct >= 90 ? "#12a454" : pct >= 75 ? "#e88a1b" : "#e0433c";
 
   return (
-    <div className="relative mx-auto h-[220px] w-[220px]">
+    <div className="relative mx-auto aspect-[2/1.15] w-full max-w-[220px]">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -20,8 +20,8 @@ export function GaugeChart({ pct }: GaugeChartProps) {
             dataKey="value"
             startAngle={180}
             endAngle={0}
-            innerRadius={70}
-            outerRadius={95}
+            innerRadius="58%"
+            outerRadius="80%"
             stroke="none"
           >
             <Cell fill={color} />

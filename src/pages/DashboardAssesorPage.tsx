@@ -58,10 +58,10 @@ export function DashboardAssesorPage() {
           />
         </div>
 
-        <div className="flex space-x-4 items-stretch">
-          <div className="flex flex-1 flex-col space-y-4">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
+          <div className="flex flex-1 min-w-0 flex-col space-y-4">
             {/* Donuts + gauge */}
-            <div className="flex space-x-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
               <Panel title="Beban Kerja Saya" onMore={() => navigate("/modul/mod-verifikasi")}>
                 <DonutChart data={data.bebanKerjaSaya} total={data.totalPenugasanAktif} />
               </Panel>
@@ -109,7 +109,7 @@ export function DashboardAssesorPage() {
             </div>
           </div>
           {/* Calendar and Agenda */}
-          <div className="h-fit w-fit space-y-4">
+          <div className="h-fit w-fit space-y-4 lg:w-[300px] lg:flex-shrink-0">
             <Calendar
             currentDate={currentDate}
             onMonthChange={setCurrentDate}

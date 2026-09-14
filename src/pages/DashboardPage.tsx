@@ -70,6 +70,10 @@ export function DashboardPage() {
           </Panel>
         </div>
 
+        <div>
+          
+        </div>
+
         {/* Trend + top provinces */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <Panel title="Tren Pengajuan (12 Bulan Terakhir)">
