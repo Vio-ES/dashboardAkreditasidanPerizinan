@@ -45,7 +45,7 @@ export function DashboardAssesorPage() {
 
       <div className="flex-1 space-y-6 p-6">
         {/* Stat cards */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="flex overflow-x-auto gap-2.5 snap-x snap-mandatory lg:grid lg:gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard icon={Building2} label="Total Penugasan Aktif" value={data.totalPenugasanAktif} delta={data.penugasanDeltaText} accent="blue" />
           <StatCard icon={FileStack} label="Sedang Berproses" value={data.sedangBerproses} delta={data.sedangBerprosesPct} accent="green" />
           <StatCard icon={FileCheck2} label="Selesai" value={data.selesai} delta={data.selesaiPct} accent="orange" />
@@ -58,81 +58,58 @@ export function DashboardAssesorPage() {
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4">
-          {/* Donuts + gauge */}
-          <div className="row-start-1 flex gap-4">
-            <Panel title="Beban Kerja Saya" onMore={() => navigate("/modul/mod-pengajuan")}>
-              <DonutChart data={data.bebanKerjaSaya} total={data.totalPenugasanAktif} />
-            </Panel>
-            <Panel title="Penugasan Berdasarkan Status" onMore={() => navigate("/modul/mod-verifikasi")}>
-              <DonutChart data={data.penugasanStatus} total={data.totalPenugasanAktif} />
-            </Panel>
-            <Panel title="SLA Pengajuan Saya" onMore={() => navigate("/modul/mod-monitoring")} center>
-              <GaugeChart pct={data.slaGaugePct} />
-              <div className="mt-2 text-center text-xs text-ink-faint">
-                SLA Terlampaui <b className="text-ink">{fmt(data.slaTerlampauiCount)}</b> dari {fmt(data.totalPenugasanAktif)}
-              </div>
-            </Panel>
-          </div>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
+          <div className="flex flex-1 min-w-0 flex-col space-y-4">
+            {/* Donuts + gauge */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+              <Panel title="Beban Kerja Saya" onMore={() => navigate("/modul/mod-verifikasi")}>
+                <DonutChart data={data.bebanKerjaSaya} total={data.totalPenugasanAktif} />
+              </Panel>
+              <Panel title="Penugasan Berdasarkan Status" onMore={() => navigate("/modul/mod-penugasan")}>
+                <DonutChart data={data.penugasanStatus} total={data.totalPenugasanAktif} />
+              </Panel>
+              <Panel title="SLA Pengajuan Saya" onMore={() => navigate("/modul/mod-monitoring")} center>
+                <GaugeChart pct={data.slaGaugePct} />
+                <div className="mt-2 text-center text-xs text-ink-faint">
+                  SLA Terlampaui <b className="text-ink">{fmt(data.slaTerlampauiCount)}</b> dari {fmt(data.totalPenugasanAktif)}
+                </div>
+              </Panel>
+            </div>
 
-          {/* Table */}
-          <div className="row-start-2 overflow-x-auto h-fit rounded-box border border-base-50 bg-base-200">
-          <table className="table table-xs">
-              <thead>
-                <tr className="font-bold text-primary">
-                  <th>No.</th>
-                  <th>Kode Penugasan</th>
-                  <th>LPK</th>
-                  <th>Jenis Layanan</th>
-                  <th>Tahap</th>
-                  <th>Tgl. Penugasan</th>
-                  <th>SLA</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.penugasanAktifList.map((penugasanAktif) => (
-                  <tr key={penugasanAktif.no} className="hover:bg-neutral-content">
-                    <th>{penugasanAktif.no}</th>
-                    <th>{penugasanAktif.kodePenugasan}</th>
-                    <th>{penugasanAktif.lpk}</th>
-                    <th>{penugasanAktif.jenisLayanan}</th>
-                    <th>{penugasanAktif.tahap}</th>
-                    <th>{penugasanAktif.tglPenugasan}</th>
-                    <th>{penugasanAktif.sla}</th>
-                    <th>{penugasanAktif.status}</th>
+            {/* Table */}
+            <div className="flex flex-1 overflow-x-auto rounded-card shadow-card bg-white p-4">
+            <table className="table table-xs xl:table-lg">
+                <thead>
+                  <tr className="text-ink">
+                    <th>No.</th>
+                    <th>Kode Penugasan</th>
+                    <th>LPK</th>
+                    <th>Jenis Layanan</th>
+                    <th>Tahap</th>
+                    <th>Tgl. Penugasan</th>
+                    <th>SLA</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-          </table>
-        </div>
-
-          {/* Trend*/}
-          <div className="row-start-3 flex gap-4">
-            <Panel title="Tren Kinerja (12 Bulan Terakhir)">
-              <TrendChart values={data.trendPerformance} months={data.trendMonths} />
-            </Panel>
-            <Panel title="Kinerja Berdasarkan Dimensi" onMore={() => navigate("/modul/mod-laporan")}>
-              <div className="space-y-3">
-                {data.kinerjaDimensi.map((p, i) => (
-                  <div key={p.label} className="flex items-center gap-3">
-                    <span className="w-5 text-xs font-bold text-ink-faint">{i + 1}</span>
-                    <span className="flex-1 text-sm text-ink">{p.label}</span>
-                    <div className="h-2 w-24 overflow-hidden rounded-full bg-line">
-                      <div
-                        className="h-full rounded-full bg-blue"
-                        style={{ width: `${(p.score / data.kinerjaDimensi[0].score) * 100}%` }}
-                      />
-                    </div>
-                    <span className="w-10 text-right text-sm font-semibold text-ink">{fmt(p.score)}</span>
-                  </div>
-                ))}
-              </div>
-            </Panel>
+                </thead>
+                <tbody>
+                  {data.penugasanAktifList.map((penugasanAktif) => (
+                    <tr key={penugasanAktif.no} className="hover:bg-neutral-content">
+                      <th>{penugasanAktif.no}</th>
+                      <th>{penugasanAktif.kodePenugasan}</th>
+                      <th>{penugasanAktif.lpk}</th>
+                      <th>{penugasanAktif.jenisLayanan}</th>
+                      <th>{penugasanAktif.tahap}</th>
+                      <th>{penugasanAktif.tglPenugasan}</th>
+                      <th>{penugasanAktif.sla}</th>
+                      <th>{penugasanAktif.status}</th>
+                    </tr>
+                  ))}
+                </tbody>
+            </table>
+            </div>
           </div>
-
           {/* Calendar and Agenda */}
-          <div className="col-start-2 row-span-3 h-full w-fit space-y-4">
+          <div className="h-fit w-fit space-y-4 lg:w-[300px] lg:flex-shrink-0">
             <Calendar
             currentDate={currentDate}
             onMonthChange={setCurrentDate}
@@ -145,6 +122,31 @@ export function DashboardAssesorPage() {
               events={data.agendaList}
             />
           </div>
+        </div>
+
+
+        {/* Trend + Kinerja Berdasarkan Dimensi */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <Panel title="Tren Kinerja (12 Bulan Terakhir)">
+            <TrendChart values={data.trendPerformance} months={data.trendMonths} />
+          </Panel>
+          <Panel title="Kinerja Berdasarkan Dimensi" onMore={() => navigate("/modul/mod-laporan")}>
+            <div className="space-y-3">
+              {data.kinerjaDimensi.map((p, i) => (
+                <div key={p.label} className="flex items-center gap-3">
+                  <span className="w-5 text-xs font-bold text-ink-faint">{i + 1}</span>
+                  <span className="flex-1 text-sm text-ink">{p.label}</span>
+                  <div className="h-2 w-24 overflow-hidden rounded-full bg-line">
+                    <div
+                      className="h-full rounded-full bg-blue"
+                      style={{ width: `${(p.score / data.kinerjaDimensi[0].score) * 100}%` }}
+                    />
+                  </div>
+                  <span className="w-10 text-right text-sm font-semibold text-ink">{fmt(p.score)}</span>
+                </div>
+              ))}
+            </div>
+          </Panel>
         </div>
 
         <div className="flex flex-col gap-1 pb-2 text-xs text-ink-faint sm:flex-row sm:items-center sm:justify-between">

@@ -10,15 +10,15 @@ interface DonutChartProps {
 export function DonutChart({ data, total }: DonutChartProps) {
   return (
     <div>
-      <div className="relative mx-auto h-[180px] w-[180px]">
+      <div className="relative mx-auto aspect-square w-full max-w-[180px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
               dataKey="value"
               nameKey="label"
-              innerRadius={58}
-              outerRadius={80}
+              innerRadius="58%"
+              outerRadius="80%"
               paddingAngle={2}
               stroke="none"
             >
