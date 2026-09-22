@@ -76,6 +76,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   <li>
                     <NavItem to="/dashboardassesor" label="Dashboard Assesor" icon={LayoutDashboard} end />
                   </li>
+                  <li>
+                    <NavItem to="/dashboardLPK" label="Dashboard LPK" icon={LayoutDashboard} end />
+                  </li>
                 </ul>
               </details>
             </li>

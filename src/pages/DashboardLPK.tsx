@@ -6,14 +6,14 @@ import { StatCard } from "@/components/ui/StatCard";
 import { DonutChart } from "@/components/charts/DonutChart";
 import { GaugeChart } from "@/components/charts/GaugeChart";
 import { TrendChart } from "@/components/charts/TrendChart";
-import { useDashboardData, useNotifications } from "@/hooks/useDashboardData";
+import { useDashboardLPK, useNotifications } from "@/hooks/useDashboardData";
 import type { PeriodKey } from "@/types";
 import { fmt } from "@/lib/utils";
 import { Panel } from "@/components/ui/Panel";
 
-export function DashboardPage() {
+export function DashboardLPK() {
   const [period, setPeriod] = useState<PeriodKey>("mei2026");
-  const { data, isLoading } = useDashboardData(period);
+  const { data, isLoading } = useDashboardLPK(period);
   const { data: notifications } = useNotifications();
   const navigate = useNavigate();
 

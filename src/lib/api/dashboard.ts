@@ -27,6 +27,13 @@ export async function fetchDashboardAsesorData(period: PeriodKey): Promise<Dashb
   return data;
 }
 
+export async function fetchDashboardLPK(period: PeriodKey): Promise<DashboardData> {
+  await delay(SIMULATED_LATENCY_MS);
+  const data = DASHBOARD_DATA[period];
+  if (!data) throw new Error(`Unknown period: ${period}`);
+  return data;
+}
+
 const MOCK_NOTIFICATIONS: Notification[] = [
   { id: "n1", title: "5 pengajuan baru menunggu verifikasi", time: "10 menit lalu", read: false },
   { id: "n2", title: "SLA pengajuan AKR-2026-0142 akan terlampaui besok", time: "1 jam lalu", read: false },

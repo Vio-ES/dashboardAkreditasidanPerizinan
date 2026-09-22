@@ -43,9 +43,9 @@ export function DashboardAssesorPage() {
         onPeriodChange={setPeriod}
       />
 
-      <div className="flex-1 space-y-6 p-6 h-screen">
+      <div className="flex-1 space-y-6 p-6">
         {/* Stat cards */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="flex overflow-x-auto gap-2.5 snap-x snap-mandatory lg:grid lg:gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard icon={Building2} label="Total Penugasan Aktif" value={data.totalPenugasanAktif} delta={data.penugasanDeltaText} accent="blue" />
           <StatCard icon={FileStack} label="Sedang Berproses" value={data.sedangBerproses} delta={data.sedangBerprosesPct} accent="green" />
           <StatCard icon={FileCheck2} label="Selesai" value={data.selesai} delta={data.selesaiPct} accent="orange" />

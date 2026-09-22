@@ -3,6 +3,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { ModulePage } from "@/pages/ModulePage";
 import { DashboardAssesorPage } from "./pages/DashboardAssesorPage";
+import { DashboardLPK } from "./pages/DashboardLPK";
 
 export default function App() {
   return (
@@ -10,6 +11,7 @@ export default function App() {
       <Route element={<AppLayout />}>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/dashboardassesor" element={<DashboardAssesorPage/>} />
+        <Route path="/dashboardLPK" element={<DashboardLPK/>} />
         <Route path="/modul/:key" element={<ModulePage />} />
       </Route>
     </Routes>
