@@ -3,6 +3,7 @@ import { ChevronDown, Landmark } from "lucide-react";
 import { PERIOD_OPTIONS } from "@/data/staticData";
 import type { PeriodKey } from "@/types";
 import { cn } from "@/lib/utils";
+import Profile from "../ui/Profile";
 
 interface TopbarProps {
   title: string;
@@ -82,6 +83,7 @@ export function Topbar({ title, subtitle, period, onPeriodChange }: TopbarProps)
             <br />
             REPUBLIK INDONESIA
           </div>
+          <Profile/>
         </div>
       </div>
     </div>
