@@ -4,10 +4,12 @@ import { DashboardPage } from "@/pages/DashboardPage";
 import { ModulePage } from "@/pages/ModulePage";
 import { DashboardAssesorPage } from "./pages/DashboardAssesorPage";
 import { DashboardLPK } from "./pages/DashboardLPK";
+import LoginPage from "./pages/LoginPage";
 
 export default function App() {
   return (
     <Routes>
+      <Route path="/login" element={<LoginPage />} />
       <Route element={<AppLayout />}>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/dashboardassesor" element={<DashboardAssesorPage/>} />
