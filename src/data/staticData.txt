@@ -551,7 +551,7 @@ type DefWithoutCount = Omit<ModuleDefinition, "count">;
 
 const DEFINITIONS_BASE: DefWithoutCount[] = [
   { key: "mod-pengajuan", navLabel: "Pengajuan Akreditasi", title: "Pengajuan Akreditasi", sub: "Daftar seluruh pengajuan akreditasi yang masuk ke sistem.", addLabel: "Pengajuan Baru", cols: ["ID Pengajuan", "Nama LPK", "Jenis Layanan", "Provinsi", "Tanggal Ajuan", "Status"], statusKey: "Status", icon: "FileText", showBadge: true },
-  { key: "mod-lpk", navLabel: "Daftar Lembaga", title: "Daftar Lembaga", sub: "Daftar seluruh lembaga pelatihan yang masuk ke sistem.", addLabel: "Lembaga Baru", cols: ["Nama LPK", "VIN", "Jenis Lembaga", "Provinsi", "Tahun Akreditasi", "Status"], statusKey: "Status", icon: "FileText", showBadge: true },
+  { key: "mod-lpk", navLabel: "Daftar Lembaga", title: "Daftar Lembaga", sub: "Daftar seluruh lembaga pelatihan yang masuk ke sistem.", addLabel: "Lembaga Baru", cols: ["ID Lembaga","Nama LPK", "Jenis Lembaga", "Provinsi", "Tahun Akreditasi", "Status"], statusKey: "Status", icon: "FileText", showBadge: true },
   { key: "mod-verifikasi", navLabel: "Verifikasi", title: "Verifikasi Dokumen", sub: "Status verifikasi kelengkapan dokumen pengajuan.", addLabel: "Verifikasi Baru", cols: ["ID Pengajuan", "Nama LPK", "Petugas Verifikasi", "Tanggal", "Status"], statusKey: "Status", icon: "CheckSquare", showBadge: true },
   { key: "mod-penugasan", navLabel: "Penugasan Asesor", title: "Penugasan Asesor", sub: "Alokasi asesor untuk setiap pengajuan yang lolos verifikasi.", addLabel: "Penugasan Asesor", cols: ["ID Pengajuan", "Nama LPK", "Asesor Ditugaskan", "Tanggal Penugasan", "Status"], statusKey: "Status", icon: "Users", showBadge: true },
   { key: "mod-asesmen", navLabel: "Asesmen", title: "Asesmen Lapangan", sub: "Pelaksanaan dan hasil asesmen lapangan LPK.", addLabel: "Jadwal Asesmen", cols: ["ID Pengajuan", "Nama LPK", "Asesor", "Tanggal Asesmen", "Status"], statusKey: "Status", icon: "ClipboardList", showBadge: true },
@@ -563,9 +563,91 @@ const DEFINITIONS_BASE: DefWithoutCount[] = [
   { key: "mod-laporan", navLabel: "Laporan & Analitik", title: "Laporan & Analitik", sub: "Ringkasan performa akreditasi per wilayah dan periode.", addLabel: "Ekspor Laporan", cols: ["Provinsi", "Jumlah Pengajuan", "Terakreditasi", "Rata-rata SLA", "Status"], statusKey: "Status", icon: "BarChart3", showBadge: false },
 ];
 
+function buildRows(key: string): ModuleRow[] {
+  switch (key) {
+    case "mod-pengajuan":
+      return seededRows(12, (i) => ({
+        "ID Pengajuan": `AKR-2026-0${1200 + i}`, "Nama LPK": LPK_NAMES[i % LPK_NAMES.length],
+        "Jenis Layanan": ["Akreditasi Baru", "Reakreditasi", "Penambahan Program"][i % 3],
+        "Provinsi": PROVINCES[i % PROVINCES.length], "Tanggal Ajuan": `0${(i % 9) + 1} Mei 2026`,
+        "Status": ["Menunggu Verifikasi", "Dalam Proses", "Terverifikasi", "Ditolak"][i % 4],
+      }));
+      break;
+    case "mod-lpk":
+    return seededRows(12, (i) => ({
+      "ID Pengajuan": `AKR-2026-0${1200 + i}`, "Nama LPK": LPK_NAMES[i % LPK_NAMES.length],
+      "Jenis Lembaga": ["Akreditasi Baru", "Reakreditasi", "Penambahan Program"][i % 3],
+      "Provinsi": PROVINCES[i % PROVINCES.length], "Tanggal Ajuan": `0${(i % 9) + 1} Mei 2026`,
+      "Status": ["Menunggu Verifikasi", "Dalam Proses", "Terverifikasi", "Ditolak"][i % 4],
+    }));
+    break;
+    case "mod-verifikasi":
+      return seededRows(12, (i) => ({
+        "ID Pengajuan": `AKR-2026-0${1150 + i}`, "Nama LPK": LPK_NAMES[(i + 2) % LPK_NAMES.length],
+        "Petugas Verifikasi": ASESOR_NAMES[i % ASESOR_NAMES.length], "Tanggal": `0${(i % 9) + 1} Mei 2026`,
+        "Status": ["Terverifikasi", "Menunggu Verifikasi", "Ditolak"][i % 3],
+      }));
+    case "mod-penugasan":
+      return seededRows(12, (i) => ({
+        "ID Pengajuan": `AKR-2026-0${1100 + i}`, "Nama LPK": LPK_NAMES[(i + 4) % LPK_NAMES.length],
+        "Asesor Ditugaskan": ASESOR_NAMES[(i + 1) % ASESOR_NAMES.length], "Tanggal Penugasan": `0${(i % 9) + 1} Mei 2026`,
+        "Status": ["Terjadwal", "Dalam Proses", "Selesai"][i % 3],
+      }));
+    case "mod-asesmen":
+      return seededRows(12, (i) => ({
+        "ID Pengajuan": `AKR-2026-0${1080 + i}`, "Nama LPK": LPK_NAMES[(i + 6) % LPK_NAMES.length],
+        "Asesor": ASESOR_NAMES[(i + 3) % ASESOR_NAMES.length], "Tanggal Asesmen": `0${(i % 9) + 1} Mei 2026`,
+        "Status": ["Terjadwal", "Dalam Proses", "Selesai"][i % 3],
+      }));
+    case "mod-review":
+      return seededRows(10, (i) => ({
+        "ID Pengajuan": `AKR-2026-0${1050 + i}`, "Nama LPK": LPK_NAMES[(i + 1) % LPK_NAMES.length],
+        "Reviewer": ASESOR_NAMES[(i + 5) % ASESOR_NAMES.length], "Tanggal Review": `0${(i % 9) + 1} Mei 2026`,
+        "Status": ["Ditinjau", "Disetujui", "Ditolak"][i % 3],
+      }));
+    case "mod-keputusan":
+      return seededRows(10, (i) => ({
+        "ID Pengajuan": `AKR-2026-0${1020 + i}`, "Nama LPK": LPK_NAMES[(i + 7) % LPK_NAMES.length],
+        "Nomor SK": `SK/${400 + i}/LTV/2026`, "Tanggal Keputusan": `0${(i % 9) + 1} Mei 2026`,
+        "Status": ["Disetujui", "Ditinjau", "Ditolak"][i % 3],
+      }));
+    case "mod-sertifikat":
+      return seededRows(12, (i) => ({
+        "No. Sertifikat": `SERT-2026-0${700 + i}`, "Nama LPK": LPK_NAMES[i % LPK_NAMES.length],
+        "Jenis Layanan": ["Akreditasi Baru", "Reakreditasi"][i % 2], "Tanggal Terbit": `0${(i % 9) + 1} Mei 2026`,
+        "Status": ["Terbit", "Diproses"][i % 2],
+      }));
+    case "mod-pembiayaan":
+      return seededRows(12, (i) => ({
+        "ID Pengajuan": `AKR-2026-0${1300 + i}`, "Nama LPK": LPK_NAMES[(i + 3) % LPK_NAMES.length],
+        "Sumber Dana": ["APBN", "APBD", "Mandiri"][i % 3], "Nominal": `Rp ${15 + i}.500.000`,
+        "Status": ["Cair", "Pending", "Diproses"][i % 3],
+      }));
+    case "mod-monitoring":
+      return seededRows(12, (i) => ({
+        "ID Pengajuan": `AKR-2026-0${1400 + i}`, "Nama LPK": LPK_NAMES[(i + 8) % LPK_NAMES.length],
+        "Tahap Saat Ini": ["Verifikasi", "Asesmen", "Review", "Keputusan"][i % 4],
+        "Sisa Waktu SLA": i % 5 === 0 ? "Terlampaui" : `${3 + (i % 10)} hari`,
+        "Status": i % 5 === 0 ? "Kritis" : i % 3 === 0 ? "Perhatian" : "Normal",
+      }));
+    case "mod-laporan":
+      return PROVINCES.map((p, i) => ({
+        "Provinsi": p, "Jumlah Pengajuan": 214 - i * 22 > 0 ? 214 - i * 22 : 40,
+        "Terakreditasi": 160 - i * 15 > 0 ? 160 - i * 15 : 30, "Rata-rata SLA": `${5 + i} hari`,
+        "Status": i % 3 === 0 ? "Normal" : i % 3 === 1 ? "Perhatian" : "Normal",
+      }));
+    default:
+      return [];
+  }
+}
+
 // Rows are computed once per key and reused — this is what a real
 // backend's response would look like, just generated locally instead
 // of fetched.
+const ROWS_BY_KEY: Record<string, ModuleRow[]> = Object.fromEntries(
+  DEFINITIONS_BASE.map((def) => [def.key, buildRows(def.key)])
+);
+
 const MODULE_DEFINITIONS: ModuleDefinition[] = DEFINITIONS_BASE.map((def) => ({
   ...def,
   count: 0,
@@ -573,4 +655,10 @@ const MODULE_DEFINITIONS: ModuleDefinition[] = DEFINITIONS_BASE.map((def) => ({
 
 export function getModuleDefinitions(): ModuleDefinition[] {
   return MODULE_DEFINITIONS;
+}
+
+export function getModuleData(key: string): ModuleData | undefined {
+  const def = MODULE_DEFINITIONS.find((m) => m.key === key);
+  if (!def) return undefined;
+  return { ...def, rows: ROWS_BY_KEY[key] ?? [] };
 }

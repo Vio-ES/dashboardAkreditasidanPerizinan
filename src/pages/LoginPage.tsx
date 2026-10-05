@@ -42,7 +42,7 @@ export default function LoginPage(){
         }
 
         triggerToast('Login successful! Redirecting...', 'success');
-        navigate('/');
+        navigate('/dashboard');
     };
 
 

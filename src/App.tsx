@@ -9,9 +9,9 @@ import LoginPage from "./pages/LoginPage";
 export default function App() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/" element={<LoginPage />} />
       <Route element={<AppLayout />}>
-        <Route path="/" element={<DashboardPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/dashboardassesor" element={<DashboardAssesorPage/>} />
         <Route path="/dashboardLPK" element={<DashboardLPK/>} />
         <Route path="/modul/:key" element={<ModulePage />} />
