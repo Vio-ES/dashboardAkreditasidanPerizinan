@@ -56,7 +56,7 @@ export function DataTable({ cols, rows, statusKey }: DataTableProps) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
+        <table className="table table-xs">
           <thead>
             <tr className="border-b border-line text-xs font-semibold uppercase tracking-wide text-ink-faint">
               {cols.map((c) => (

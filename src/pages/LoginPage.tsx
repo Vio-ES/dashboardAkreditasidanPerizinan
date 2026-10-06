@@ -20,15 +20,15 @@ export default function LoginPage(){
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    if (!email.trim() || !password) {
-        triggerToast('Please enter your email and password', 'error');
-        return;
-    }
+        if (!email.trim() || !password) {
+            triggerToast('Please enter your email and password', 'error');
+            return;
+        }
 
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+        setLoading(true);
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
         setLoading(false);
 
         if (error) {
