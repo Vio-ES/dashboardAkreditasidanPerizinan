@@ -5,7 +5,7 @@
 // not data) — only the rows and counts come from the database, via
 // the v_mod_* views defined in supabase-schema.sql.
 
-import type { ModuleData, ModuleDefinition, ModuleRow } from "@/types";
+import type { ModuleData, ModuleDefinition, ModuleRow, SortRule } from "@/types";
 import { supabase } from "@/lib/supabaseClient";
 import { getModuleDefinitions } from "@/data/staticData";
 
@@ -35,6 +35,13 @@ const TABLE_BY_KEY: Record<string, string> = {
   "mod-pembiayaan": "pembiayaan",
 };
 
+const SORT_BY_KEY: Record<string, SortRule[] | undefined> = {
+  "mod-lpk": [
+  { column: "Tanggal Input Data", ascending: false },
+  { column: "Nama LPK", ascending: false },
+  ],
+};
+
 export async function fetchModuleDefinitions(): Promise<ModuleDefinition[]> {
   const definitions = getModuleDefinitions();
 
@@ -55,17 +62,28 @@ export async function fetchModuleDefinitions(): Promise<ModuleDefinition[]> {
   return withCounts;
 }
 
-export async function fetchModuleData(key: string): Promise<ModuleData> {
+export async function fetchModuleData(key: string, page: number,
+pageSize: number): Promise<ModuleData> {
   const definitions = getModuleDefinitions();
   const def = definitions.find((m: ModuleDefinition) => m.key === key);
   const view = VIEW_BY_KEY[key];
   if (!def || !view) throw new Error(`Unknown module: ${key}`);
 
-  const { data, error } = await supabase.from(view).select("*");
-  console.log("DEBUG", key, view, { data, error });
+  const from = pageSize * page - pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase
+    .from(view)
+    .select("*", { count: "exact" });
+    const rules = SORT_BY_KEY[key] ?? [];
+  for (const rule of rules) {
+    query = query.order(rule.column, { ascending: rule.ascending, nullsFirst: false });
+  }
+
+  const { data, error, count } = await query.range(from, to);
   if (error) throw new Error(`Failed to load ${key}: ${error.message}`);
 
-  return { ...def, rows: (data ?? []) as ModuleRow[] };
+  return { ...def, rows: (data ?? []) as ModuleRow[], count: count ?? 0  };
 }
 
 export async function createModuleRow(

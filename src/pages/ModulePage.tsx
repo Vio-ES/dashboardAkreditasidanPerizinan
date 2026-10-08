@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { DataTable } from "@/components/ui/DataTable";
 import { Modal } from "@/components/ui/Modal";
@@ -9,10 +9,13 @@ import { useCreateModuleRow, useModuleData } from "@/hooks/useModuleData";
 
 export function ModulePage() {
   const { key = "" } = useParams();
-  const { data, isLoading } = useModuleData(key);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const { data, isLoading } = useModuleData(key, page, pageSize);
   const [modalOpen, setModalOpen] = useState(false);
   const { showToast } = useToast();
   const createRow = useCreateModuleRow(key);
+
 
   if (isLoading || !data) {
     return (
@@ -27,6 +30,11 @@ export function ModulePage() {
     await createRow.mutateAsync({});
     setModalOpen(false);
     showToast("Berhasil disimpan");
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(page);
   };
 
   return (
@@ -44,6 +52,29 @@ export function ModulePage() {
         </div>
 
         <DataTable cols={data.cols} rows={data.rows} statusKey={data.statusKey} />
+        <div className="flex items-center justify-end px-4 py-3 text-sm">
+          <div className="join">
+              {data.count / pageSize < 3 && 
+                Array.from({ length: data.count / pageSize }, (_, index) => index + 1)
+                  .map((pageNum) => (
+                    <button key={pageNum} className="join-item">
+                      {pageNum}
+                    </button>
+                  ))
+              }
+              {data.count / pageSize > 3 && 
+                <div className="flex items-center justify-between px-4 py-2 gap-4 text-sm">
+                  <button><ChevronLeft/></button>
+                  <button>1</button>
+                  <button>2</button>
+                  <button>3</button>
+                  <button className="join-item btn btn-disabled">...</button>
+                  <button>99</button>
+                  <button><ChevronRight/></button>
+                </div>
+              }
+          </div>
+        </div>
       </div>
 
       <Modal open={modalOpen} title={data.addLabel} onClose={() => setModalOpen(false)}>

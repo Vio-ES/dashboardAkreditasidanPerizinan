@@ -160,3 +160,7 @@ export interface ModuleDefinition {
 export interface ModuleData extends ModuleDefinition {
   rows: ModuleRow[];
 }
+
+export type SortRule = { column: string; ascending: boolean };
+
+

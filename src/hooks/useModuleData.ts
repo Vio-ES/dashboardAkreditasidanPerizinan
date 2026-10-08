@@ -8,10 +8,11 @@ export function useModuleDefinitions() {
   });
 }
 
-export function useModuleData(key: string) {
+export function useModuleData(key: string, page: number,
+pageSize: number) {
   return useQuery({
     queryKey: ["module", key],
-    queryFn: () => fetchModuleData(key),
+    queryFn: () => fetchModuleData(key, page, pageSize),
     enabled: Boolean(key),
   });
 }
