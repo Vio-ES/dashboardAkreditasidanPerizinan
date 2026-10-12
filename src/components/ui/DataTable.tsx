@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import type { ModuleRow } from "@/types";
 import { Badge } from "./Badge";
 import { fmt } from "@/lib/utils";
+import { useParams } from "react-router-dom";
 
 interface DataTableProps {
   cols: string[];
