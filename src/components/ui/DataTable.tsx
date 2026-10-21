@@ -1,19 +1,21 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import type { ModuleRow } from "@/types";
 import { Badge } from "./Badge";
 import { fmt } from "@/lib/utils";
-import { useParams } from "react-router-dom";
 
 interface DataTableProps {
   cols: string[];
   rows: ModuleRow[];
   statusKey: string;
+  moduleKey: string;
 }
 
-export function DataTable({ cols, rows, statusKey }: DataTableProps) {
+export function DataTable({ cols, rows, statusKey, moduleKey }: DataTableProps) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const navigate = useNavigate();
 
   const statusOptions = useMemo(
     () => Array.from(new Set(rows.map((r) => String(r[statusKey])))),
@@ -68,8 +70,12 @@ export function DataTable({ cols, rows, statusKey }: DataTableProps) {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((row, i) => (
-              <tr key={i} className="border-b border-line last:border-0 hover:bg-surface/60">
+            {//rendering baris-baris data
+            filtered.map((row, i) => (
+              <tr 
+              key={i} 
+              onClick={() => navigate(`/modul/${moduleKey}/${String(row["LPK UUID"])}`)}
+              className="border-b border-line last:border-0 hover:bg-surface/60">
                 {cols.map((c) => (
                   <td key={c} className="whitespace-nowrap px-4 py-3 text-ink">
                     {c === statusKey ? (

@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabaseClient";
 import { RequireAuth } from "./components/layout/RequireAuth";
 import { LoadingPage } from "./pages/LoadingPage";
+import { ModuleDetailPage } from "./pages/ModuleDetailPage";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="/dashboardassesor" element={<DashboardAssesorPage/>} />
           <Route path="/dashboardLPK" element={<DashboardLPK/>} />
           <Route path="/modul/:key" element={<ModulePage />} />
+          <Route path="/modul/:key/:id" element={<ModuleDetailPage />} />
         </Route>
       </Route>
     </Routes>

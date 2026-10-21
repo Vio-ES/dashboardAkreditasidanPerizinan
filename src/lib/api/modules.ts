@@ -11,7 +11,7 @@ import { getModuleDefinitions } from "@/data/staticData";
 
 const VIEW_BY_KEY: Record<string, string> = {
   "mod-pengajuan": "v_mod_pengajuan",
-  "mod-lpk": "v_mod_lpk",
+  "mod-lpk": "v_mod_lpk_bersih",
   "mod-verifikasi": "v_mod_verifikasi",
   "mod-penugasan": "v_mod_penugasan",
   "mod-asesmen": "v_mod_asesmen",
@@ -25,7 +25,7 @@ const VIEW_BY_KEY: Record<string, string> = {
 
 const TABLE_BY_KEY: Record<string, string> = {
   "mod-pengajuan": "pengajuan",
-  "mod-lpk": "lpk",
+  "mod-lpk": "lpk_bersih",
   "mod-verifikasi": "verifikasi",
   "mod-penugasan": "penugasan",
   "mod-asesmen": "asesmen",
@@ -37,7 +37,7 @@ const TABLE_BY_KEY: Record<string, string> = {
 
 const SORT_BY_KEY: Record<string, SortRule[] | undefined> = {
   "mod-lpk": [
-  { column: "Tanggal Input Data", ascending: false },
+  { column: "Tanggal Input", ascending: false },
   { column: "Nama LPK", ascending: false },
   ],
 };
