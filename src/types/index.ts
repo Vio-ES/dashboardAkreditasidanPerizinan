@@ -58,6 +58,19 @@ export interface DashboardData {
   workload: string;
 }
 
+export interface DashboardDataLembaga {
+  period: PeriodKey;
+  label: string;
+  asOfDate: string;
+
+  lpk: number;
+  lpkDelta: number;
+  akreditasi: number;
+  akreditasiDelta: number;
+  verifikasi: number;
+  verifikasiDelta: number;
+}
+
 // --- Tipe Data Tabel Penugasan Aktif Asesor ---
 export interface PenugasanItem {
   no: number;

@@ -19,6 +19,7 @@ import type {
   AgendaItem,
   DashboardAsesorData,
   DashboardData,
+  DashboardDataLembaga,
   Notification,
   PenugasanItem,
   PeriodKey,
@@ -109,8 +110,41 @@ export async function fetchDashboardData(period: PeriodKey): Promise<DashboardDa
 // Your original mock reused the same DashboardData for the LPK view —
 // keeping that here. Split this into its own query later if the LPK
 // dashboard should show LPK-scoped data instead of the global view.
-export async function fetchDashboardLPK(period: PeriodKey): Promise<DashboardData> {
-  return fetchDashboardData(period);
+export async function fetchDashboardLPK(period: PeriodKey): Promise<DashboardDataLembaga> {
+  const [totalRes, terverifikasiRes, terakreditasiRes] = await Promise.all([
+    supabase
+      .from("lpk_bersih")
+      .select("*", { count: "exact", head: true }),
+    supabase
+      .from("lpk_bersih")
+      .select("*", { count: "exact", head: true })
+      .eq("status_verifikasi_kelembagaan", "Terverifikasi"),
+    supabase.
+      from("lpk_bersih")
+      .select("*", { count: "exact", head: true })
+      .eq("status_akreditasi_kelembagaan", "Terakreditasi"),
+  ]);
+
+  if (totalRes.error) throw new Error(totalRes.error.message);
+  if (terverifikasiRes.error) throw new Error(terverifikasiRes.error.message);
+  if (terakreditasiRes.error) throw new Error(terakreditasiRes.error.message);
+  
+  const verifikasi = terverifikasiRes.count ?? 0;
+  const akreditasi = terakreditasiRes.count ?? 0;
+
+  console.log(terverifikasiRes.data)
+  
+  return {
+    period,
+    label: period,
+    asOfDate: new Date().toISOString().slice(0, 10),
+    lpk: totalRes.count ?? 0,
+    lpkDelta: 0,
+    akreditasi: akreditasi,
+    akreditasiDelta: 0,
+    verifikasi: verifikasi,
+    verifikasiDelta: 0,
+  };
 }
 
 export async function fetchDashboardAsesorData(

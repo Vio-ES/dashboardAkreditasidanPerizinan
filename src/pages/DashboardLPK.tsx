@@ -29,7 +29,7 @@ export function DashboardLPK() {
   return (
     <>
       <Topbar
-        title="Dashboard Nasional Akreditasi LPK"
+        title="Dashboard Nasional Lembaga"
         subtitle="Software Pengelolaan Akreditasi Lembaga Pelatihan Vokasi"
         period={period}
         onPeriodChange={setPeriod}
@@ -37,51 +37,33 @@ export function DashboardLPK() {
 
       <div className="flex-1 space-y-6 p-6">
         {/* Stat cards */}
-        <div className="flex overflow-x-auto gap-2.5 snap-x snap-mandatory lg:grid lg:gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="flex overflow-x-auto gap-2.5 snap-x snap-mandatory lg:grid lg:gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard icon={Building2} label="Total LPK Terdaftar" value={data.lpk} delta={data.lpkDelta} accent="blue" />
           <StatCard icon={FileStack} label="Total Akreditasi" value={data.akreditasi} delta={data.akreditasiDelta} accent="green" />
-          <StatCard icon={FileCheck2} label="Pengajuan Aktif" value={data.aktif} delta={data.aktifDelta} accent="orange" />
-          <StatCard icon={Award} label="Sertifikat Terbit" value={data.sertifikat} delta={data.sertifikatDelta} accent="purple" />
-          <StatCard
-            icon={Users2}
-            label="Asesor Terverifikasi"
-            value={data.asesor}
-            note={`${data.asesorNote} asesor baru bulan ini`}
-            accent="teal"
-          />
+          <StatCard icon={FileCheck2} label="Total Verifikasi" value={data.verifikasi} delta={data.verifikasiDelta} accent="orange" />
         </div>
 
         {/* Donuts + gauge */}
-        <div className="flex flex-col gap-4 md:grid md:grid-cols-4">
-          <Panel title="Pengajuan Berdasarkan Jenis Layanan" onMore={() => navigate("/modul/mod-pengajuan")}>
-            <DonutChart data={data.jenis} total={data.aktif} />
+        <div className="flex flex-col gap-4 md:grid md:grid-cols-3">
+          {/* 
+          <Panel title="Jumlah Lembaga Pelatihan Pemerintah" onMore={() => navigate("/modul/mod-lpk")}>
+            <DonutChart data={data.lpk} total={data.lpk} />
           </Panel>
-          <Panel title="Status Pengajuan" onMore={() => navigate("/modul/mod-verifikasi")}>
+          <Panel title="Jumlah Lembaga Pelatihan Swasta" onMore={() => navigate("/modul/mod-lpk")}>
             <DonutChart data={data.status} total={data.aktif} />
           </Panel>
-          <Panel title="Pengajuan Berdasarkan Pembiayaan" onMore={() => navigate("/modul/mod-pembiayaan")}>
-            <DonutChart data={data.biaya} total={data.aktif} />
+          <Panel title="Tren Jumlah Pendaftaran Lembaga (12 Bulan Terakhir)">
+            <TrendChart values={data.trend} months={data.trendMonths} />
           </Panel>
-          <Panel title="SLA Pengajuan" onMore={() => navigate("/modul/mod-monitoring")} center>
-            <GaugeChart pct={data.sla} />
-            <div className="mt-2 text-center text-xs text-ink-faint">
-              SLA Terlampaui <b className="text-ink">{fmt(data.slaOver)}</b> dari {fmt(data.aktif)}
-            </div>
-          </Panel>
-        </div>
-
-        <div>
-          
+          */}
         </div>
 
         {/* Trend + top provinces */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <Panel title="Tren Pengajuan (12 Bulan Terakhir)">
-            <TrendChart values={data.trend} months={data.trendMonths} />
-          </Panel>
+        <div className="">
+
           <Panel title="Top 5 Provinsi — Pengajuan Terbanyak" onMore={() => navigate("/modul/mod-laporan")}>
             <div className="space-y-3">
-              {data.topProvinces.map((p, i) => (
+              { /* data.topProvinces.map((p, i) => (
                 <div key={p.province} className="flex items-center gap-3">
                   <span className="w-5 text-xs font-bold text-ink-faint">{i + 1}</span>
                   <span className="flex-1 text-sm text-ink">{p.province}</span>
@@ -93,52 +75,9 @@ export function DashboardLPK() {
                   </div>
                   <span className="w-10 text-right text-sm font-semibold text-ink">{fmt(p.count)}</span>
                 </div>
-              ))}
+              )) */}
             </div>
           </Panel>
-        </div>
-
-        {/* Process summary + side cards */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <Panel title="Ringkasan Proses Akreditasi">
-            <div className="flex flex-col divide-y divide-line md:flex-row md:flex-wrap md:gap-3 md:divide-y-0">
-              {data.process.map((step) => (
-                <div key={step.label} className="flex items-center gap-3 py-2.5 md:min-w-[120px] md:flex-1 md:flex-col md:items-start md:rounded-xl md:bg-surface md:p-3 md:py-3">
-                  <div className="text-lg font-extrabold text-ink">{fmt(step.value)}</div>
-                  <div className="text-xs text-ink-soft">{step.label}</div>
-                  {step.pct !== null && <div className="text-[11px] font-semibold text-blue md:mt-1">{step.pct}%</div>}
-                </div>
-              ))}
-            </div>
-          </Panel>
-
-          <div className="space-y-4">
-            <Panel title="Beban Kerja Asesor">
-              <div className="flex items-center gap-4">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-bg text-purple">
-                  <Users2 size={20} />
-                </div>
-                <div>
-                  <div className="text-xl font-extrabold text-ink">{data.workload}</div>
-                  <div className="text-xs text-ink-faint">Rata-rata Per Asesor · Pengajuan Aktif</div>
-                </div>
-              </div>
-            </Panel>
-
-            <Panel title="Notifikasi">
-              <div className="space-y-2">
-                {notifications?.slice(0, 3).map((n) => (
-                  <div key={n.id} className="flex items-start gap-2 text-xs">
-                    <span className={`mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full ${n.read ? "bg-line" : "bg-blue"}`} />
-                    <div>
-                      <div className="text-ink-soft">{n.title}</div>
-                      <div className="text-ink-faint">{n.time}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Panel>
-          </div>
         </div>
 
         <div className="flex flex-col gap-1 pb-2 text-xs text-ink-faint sm:flex-row sm:items-center sm:justify-between">

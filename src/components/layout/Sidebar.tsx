@@ -65,7 +65,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         <nav className="flex-1 px-3 pb-5 pt-3.5">
 
-          <ul className="menu bg-base-200 rounded-box w-56">
+          <ul className="menu bg-base-200 rounded-box w-56 bg-transparent">
             <li>
               <details open>
                 <summary>Dashboard</summary>
@@ -126,8 +126,8 @@ function NavItem({ to, label, icon: Icon, badge, end }: NavItemProps) {
       end={end}
       className={({ isActive }) =>
         cn(
-          "mb-0.5 flex w-full items-center gap-2.5 rounded-[10px] px-3 py-2.5 text-[13.6px] font-semibold transition-colors",
-          isActive ? "bg-blue text-white shadow-[0_4px_12px_-2px_rgba(47,111,237,.5)]" : "text-[#aeb9d9] hover:bg-navy-hover hover:text-white"
+          "mb-0.5 flex w-full items-center gap-2.5 rounded-[10px] px-3 py-2.5 text-[13.6px] font-semibold text-white bg-transparent transition-colors",
+          isActive ? "bg-accent shadow-[0_4px_12px_-2px_rgba(47,111,237,.5)]" : " hover:bg-second hover:text-white"
         )
       }
     >
