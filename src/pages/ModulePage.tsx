@@ -7,6 +7,8 @@ import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/ToastProvider";
 import { useCreateModuleRow, useModuleData } from "@/hooks/useModuleData";
 import { Pagination } from "@/components/ui/Pagination";
+import { fetchAllModuleRows } from "@/lib/api/modules";
+import { toCSV } from "@/lib/utils";
 
 export function ModulePage() {
   const { key = "" } = useParams();
@@ -38,24 +40,41 @@ export function ModulePage() {
     showToast("Berhasil disimpan");
   };
 
+  const handleDownload = async () => {
+    const rows = await fetchAllModuleRows(key);
+    const csv = toCSV(rows);
+    const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = {key} + ".csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handlePageSizeChange = (newSize: number) => {
     setPageSize(newSize);
     setPage(page);
   };
 
-  console.log(data.rows[0]);
-
   return (
     <>
       <Topbar title={data.title} subtitle={data.sub} />
       <div className="flex-1 space-y-4 p-6">
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-end gap-3">
           <button
             onClick={() => setModalOpen(true)}
             className="flex items-center gap-2 rounded-lg bg-blue px-4 py-2 text-sm font-semibold text-white hover:bg-blue-dark"
           >
             <Plus size={16} />
             {data.addLabel}
+          </button>
+          <button
+            onClick={() => handleDownload()}
+            className="flex items-center gap-2 rounded-lg bg-blue px-4 py-2 text-sm font-semibold text-white hover:bg-blue-dark"
+          >
+            <Plus size={16} />
+            Unduh CSV
           </button>
         </div>
 

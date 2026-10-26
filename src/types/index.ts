@@ -69,6 +69,8 @@ export interface DashboardDataLembaga {
   akreditasiDelta: number;
   verifikasi: number;
   verifikasiDelta: number;
+  byStatus: ChartSlice[];
+  byProvinsi: ProvinceCount[];
 }
 
 // --- Tipe Data Tabel Penugasan Aktif Asesor ---

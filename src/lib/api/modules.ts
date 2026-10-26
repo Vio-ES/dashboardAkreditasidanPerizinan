@@ -86,6 +86,25 @@ pageSize: number): Promise<ModuleData> {
   return { ...def, rows: (data ?? []) as ModuleRow[], count: count ?? 0  };
 }
 
+export async function fetchAllModuleRows(key: string): Promise<ModuleRow[]> {
+  const definitions = getModuleDefinitions();
+  const view = VIEW_BY_KEY[key];
+  if (!view) throw new Error(`Unknown module: ${key}`);
+
+  let query = supabase
+    .from(view)
+    .select("*");
+    const rules = SORT_BY_KEY[key] ?? [];
+  for (const rule of rules) {
+    query = query.order(rule.column, { ascending: rule.ascending, nullsFirst: false });
+  }
+
+  const { data, error } = await query;
+  if (error) throw new Error(`Failed to load ${key}: ${error.message}`);
+
+  return (data ?? []) as ModuleRow[]  ;
+}
+
 export async function createModuleRow(
   key: string,
   payload: Record<string, unknown>

@@ -10,6 +10,10 @@ import { useDashboardLPK, useNotifications } from "@/hooks/useDashboardData";
 import type { PeriodKey } from "@/types";
 import { fmt } from "@/lib/utils";
 import { Panel } from "@/components/ui/Panel";
+import { ProvinceChart } from "@/components/charts/ProvinceChart";
+
+const STATUS_PEMERINTAH = ['UPTD', 'BLKK'];
+const STATUS_SWASTA = ['LPKS', 'BLKLN'];
 
 export function DashboardLPK() {
   const [period, setPeriod] = useState<PeriodKey>("mei2026");
@@ -25,6 +29,11 @@ export function DashboardLPK() {
       </>
     );
   }
+
+  const dataPemerintah = data.byStatus.filter((slice) => STATUS_PEMERINTAH.includes(slice.label));
+  const dataSwasta = data.byStatus.filter((slice) => STATUS_SWASTA.includes(slice.label));
+  const totalPemerintah = dataPemerintah.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0);
+  const totalSwasta = dataSwasta.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0);
 
   return (
     <>
@@ -45,37 +54,23 @@ export function DashboardLPK() {
 
         {/* Donuts + gauge */}
         <div className="flex flex-col gap-4 md:grid md:grid-cols-3">
-          {/* 
           <Panel title="Jumlah Lembaga Pelatihan Pemerintah" onMore={() => navigate("/modul/mod-lpk")}>
-            <DonutChart data={data.lpk} total={data.lpk} />
+            <DonutChart data={dataPemerintah} total={totalPemerintah} />
           </Panel>
           <Panel title="Jumlah Lembaga Pelatihan Swasta" onMore={() => navigate("/modul/mod-lpk")}>
-            <DonutChart data={data.status} total={data.aktif} />
+            <DonutChart data={dataSwasta} total={totalSwasta} />
           </Panel>
-          <Panel title="Tren Jumlah Pendaftaran Lembaga (12 Bulan Terakhir)">
-            <TrendChart values={data.trend} months={data.trendMonths} />
-          </Panel>
-          */}
+          {/* <Panel title="Jumlah Lembaga Per Provinsi">
+          </Panel>*/}
         </div>
 
         {/* Trend + top provinces */}
         <div className="">
 
-          <Panel title="Top 5 Provinsi — Pengajuan Terbanyak" onMore={() => navigate("/modul/mod-laporan")}>
+          <Panel title="Jumlah Lembaga Per Provinsi" onMore={() => navigate("/modul/mod-lpk")}>
             <div className="space-y-3">
-              { /* data.topProvinces.map((p, i) => (
-                <div key={p.province} className="flex items-center gap-3">
-                  <span className="w-5 text-xs font-bold text-ink-faint">{i + 1}</span>
-                  <span className="flex-1 text-sm text-ink">{p.province}</span>
-                  <div className="h-2 w-24 overflow-hidden rounded-full bg-line">
-                    <div
-                      className="h-full rounded-full bg-blue"
-                      style={{ width: `${(p.count / data.topProvinces[0].count) * 100}%` }}
-                    />
-                  </div>
-                  <span className="w-10 text-right text-sm font-semibold text-ink">{fmt(p.count)}</span>
-                </div>
-              )) */}
+              {/* delete the slice for all data shown */}
+              <ProvinceChart data={data.byProvinsi.slice(0, 10)}/>
             </div>
           </Panel>
         </div>

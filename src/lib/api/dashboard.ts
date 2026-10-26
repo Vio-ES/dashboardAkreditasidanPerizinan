@@ -111,7 +111,7 @@ export async function fetchDashboardData(period: PeriodKey): Promise<DashboardDa
 // keeping that here. Split this into its own query later if the LPK
 // dashboard should show LPK-scoped data instead of the global view.
 export async function fetchDashboardLPK(period: PeriodKey): Promise<DashboardDataLembaga> {
-  const [totalRes, terverifikasiRes, terakreditasiRes] = await Promise.all([
+  const [totalRes, terverifikasiRes, terakreditasiRes, statusRes, trendRes, provinsiRes] = await Promise.all([
     supabase
       .from("lpk_bersih")
       .select("*", { count: "exact", head: true }),
@@ -119,20 +119,39 @@ export async function fetchDashboardLPK(period: PeriodKey): Promise<DashboardDat
       .from("lpk_bersih")
       .select("*", { count: "exact", head: true })
       .eq("status_verifikasi_kelembagaan", "Terverifikasi"),
-    supabase.
-      from("lpk_bersih")
+    supabase
+      .from("lpk_bersih")
       .select("*", { count: "exact", head: true })
       .eq("status_akreditasi_kelembagaan", "Terakreditasi"),
+    supabase
+      .from("v_dashboard_lpk_by_status")
+      .select("*")
+      .order("status", { ascending: true }),
+    supabase
+      .from("v_dashboard_lpk_months")
+      .select("*")
+      .order("bulan", { ascending: false })
+      .limit(12),
+    supabase
+      .from("v_dashboard_lpk_by_provinsi")
+      .select("*")
+      .order("value", { ascending: false }),
   ]);
 
   if (totalRes.error) throw new Error(totalRes.error.message);
   if (terverifikasiRes.error) throw new Error(terverifikasiRes.error.message);
   if (terakreditasiRes.error) throw new Error(terakreditasiRes.error.message);
+  if (statusRes.error) throw new Error(statusRes.error.message);
+  if (trendRes.error) throw new Error(trendRes.error.message);
+  if (provinsiRes.error) throw new Error(provinsiRes.error.message);
+  console.log(provinsiRes.data);
+
+  const status = statusRes.data.map((row, i) => ({ label: row.status, value: row.value, color: PALETTE[i % PALETTE.length] }));
+  const byProvinsi = provinsiRes.data.map(row => ({ province: row.provinsi, count: row.value }));
+  console.log(byProvinsi[0])
   
   const verifikasi = terverifikasiRes.count ?? 0;
   const akreditasi = terakreditasiRes.count ?? 0;
-
-  console.log(terverifikasiRes.data)
   
   return {
     period,
@@ -144,6 +163,8 @@ export async function fetchDashboardLPK(period: PeriodKey): Promise<DashboardDat
     akreditasiDelta: 0,
     verifikasi: verifikasi,
     verifikasiDelta: 0,
+    byStatus: status,
+    byProvinsi: byProvinsi,
   };
 }
 
