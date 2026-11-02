@@ -20,7 +20,6 @@ export default function App() {
     // BLOK 1: fungsi pengambil session awal
     const loadData = async () => {
       try {
-        await new Promise((r) => setTimeout(r, 2000)); // SEMENTARA: hapus nanti
         const { data } = await supabase.auth.getSession();
         setSession(data.session);
       } catch (error) {

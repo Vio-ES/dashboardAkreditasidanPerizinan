@@ -23,6 +23,7 @@ import type {
   Notification,
   PenugasanItem,
   PeriodKey,
+  TahunStatusCount,
 } from "@/types";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -32,16 +33,23 @@ function periodToDateRange(period: PeriodKey): { from: string; to: string } {
     apr2026: { from: "2026-04-01", to: "2026-04-30" },
     mar2026: { from: "2026-03-01", to: "2026-03-31" },
     q2026: { from: "2026-01-01", to: "2026-03-31" },
+    y2020: { from: "2020-01-01", to: "2020-12-31" },
     y2026: { from: "2026-01-01", to: "2026-12-31" },
   };
   return ranges[period];
 }
 
-const PALETTE = ["#2f6fed", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6"];
+const PALETTE = [
+  "#15406A", // Biru tua: primary
+  "#56849F", // Biru sedang: secondary
+  "#A0BECD", // Biru muda: info
+  "#65A853", // Hijau: success
+  "#B88735", // Emas kecokelatan: warning
+];
 
 function groupBy<T extends Record<string, unknown>>(
   rows: T[] | null,
-  key: keyof T
+  key: keyof T,
 ): { label: string; value: number }[] {
   const counts = new Map<string, number>();
   for (const row of rows ?? []) {
@@ -51,7 +59,81 @@ function groupBy<T extends Record<string, unknown>>(
   return Array.from(counts, ([label, value]) => ({ label, value }));
 }
 
-export async function fetchDashboardData(period: PeriodKey): Promise<DashboardData> {
+export interface ObjekTahun {
+  rows: TahunStatusCount[];
+  status: string;
+  tahun: number;
+}
+
+function buatObjekTahun({ rows, status, tahun }: ObjekTahun) {
+  const hasilFilter = rows
+    .filter((d) => d.status == status)
+    .filter((n) => n.tahun_akreditasi == tahun);
+
+  const objectGrafik = {
+    tahun: tahun,
+    Terakreditasi:
+      hasilFilter.find(
+        (m) => m.status_akreditasi_kelembagaan === "Terakreditasi",
+      )?.value ?? 0,
+    "Belum Terakreditasi":
+      hasilFilter.find(
+        (m) => m.status_akreditasi_kelembagaan === "Belum Terakreditasi",
+      )?.value ?? 0,
+    "Belum Ada Data":
+      hasilFilter.find(
+        (m) => m.status_akreditasi_kelembagaan === "Belum Ada Data",
+      )?.value ?? 0,
+  };
+
+  return objectGrafik;
+}
+
+function buatObjekGabungan(
+  rows: TahunStatusCount[],
+  tahun: number,
+  daftarLembaga: string[],
+) {
+  const daftarStatus = [
+    "Terakreditasi",
+    "Belum Terakreditasi",
+    "Belum Ada Data",
+  ];
+  const hasil: Record<string, number> = { tahun };
+
+  daftarLembaga.forEach((lembaga) => {
+    const baris = rows
+      .filter((d) => d.status === lembaga)
+      .filter((d) => d.tahun_akreditasi === tahun);
+
+    daftarStatus.forEach((status) => {
+      hasil[lembaga + "_" + status.replace(/ /g, "")] =
+        baris.find((m) => m.status_akreditasi_kelembagaan === status)?.value ??
+        0;
+    });
+  });
+
+  return hasil;
+}
+
+function buatDataGrafikTahunan({
+  rows,
+  status,
+}: {
+  rows: TahunStatusCount[];
+  status: string;
+}) {
+  const tahun = [2019, 2020];
+  const data = tahun.map((t) =>
+    buatObjekTahun({ rows: rows, status: status, tahun: t }),
+  );
+
+  return data;
+}
+
+export async function fetchDashboardData(
+  period: PeriodKey,
+): Promise<DashboardData> {
   const { from, to } = periodToDateRange(period);
 
   const [statusRes, jenisRes, provincesRes] = await Promise.all([
@@ -95,7 +177,10 @@ export async function fetchDashboardData(period: PeriodKey): Promise<DashboardDa
     asesor: 0,
     asesorNote: 0,
     jenis: jenis.map((j, i) => ({ ...j, color: PALETTE[i % PALETTE.length] })),
-    status: status.map((s, i) => ({ ...s, color: PALETTE[i % PALETTE.length] })),
+    status: status.map((s, i) => ({
+      ...s,
+      color: PALETTE[i % PALETTE.length],
+    })),
     biaya: [],
     sla: 0,
     slaOver: 0,
@@ -110,11 +195,19 @@ export async function fetchDashboardData(period: PeriodKey): Promise<DashboardDa
 // Your original mock reused the same DashboardData for the LPK view —
 // keeping that here. Split this into its own query later if the LPK
 // dashboard should show LPK-scoped data instead of the global view.
-export async function fetchDashboardLPK(period: PeriodKey): Promise<DashboardDataLembaga> {
-  const [totalRes, terverifikasiRes, terakreditasiRes, statusRes, trendRes, provinsiRes] = await Promise.all([
-    supabase
-      .from("lpk_bersih")
-      .select("*", { count: "exact", head: true }),
+export async function fetchDashboardLPK(
+  period: PeriodKey,
+): Promise<DashboardDataLembaga> {
+  const [
+    totalRes,
+    terverifikasiRes,
+    terakreditasiRes,
+    statusRes,
+    trendRes,
+    provinsiRes,
+    bytahunRes,
+  ] = await Promise.all([
+    supabase.from("lpk_bersih").select("*", { count: "exact", head: true }),
     supabase
       .from("lpk_bersih")
       .select("*", { count: "exact", head: true })
@@ -136,6 +229,11 @@ export async function fetchDashboardLPK(period: PeriodKey): Promise<DashboardDat
       .from("v_dashboard_lpk_by_provinsi")
       .select("*")
       .order("value", { ascending: false }),
+    supabase
+      .from("v_dashboard_lpk_by_tahun")
+      .select("*")
+      .order("tahun_akreditasi", { ascending: true })
+      .order("status", { ascending: true }),
   ]);
 
   if (totalRes.error) throw new Error(totalRes.error.message);
@@ -144,15 +242,39 @@ export async function fetchDashboardLPK(period: PeriodKey): Promise<DashboardDat
   if (statusRes.error) throw new Error(statusRes.error.message);
   if (trendRes.error) throw new Error(trendRes.error.message);
   if (provinsiRes.error) throw new Error(provinsiRes.error.message);
-  console.log(provinsiRes.data);
+  if (bytahunRes.error) throw new Error(bytahunRes.error.message);
 
-  const status = statusRes.data.map((row, i) => ({ label: row.status, value: row.value, color: PALETTE[i % PALETTE.length] }));
-  const byProvinsi = provinsiRes.data.map(row => ({ province: row.provinsi, count: row.value }));
-  console.log(byProvinsi[0])
-  
+  const status = statusRes.data.map((row, i) => ({
+    label: row.status,
+    value: row.value,
+    color: PALETTE[i % PALETTE.length],
+  }));
+  const byProvinsi = provinsiRes.data.map((row) => ({
+    province: row.provinsi,
+    count: row.value,
+  }));
+
   const verifikasi = terverifikasiRes.count ?? 0;
   const akreditasi = terakreditasiRes.count ?? 0;
-  
+
+  const grafikTahun = {
+    LPKS: buatDataGrafikTahunan({ rows: bytahunRes.data, status: "LPKS" }),
+    BLKLN: buatDataGrafikTahunan({ rows: bytahunRes.data, status: "BLKLN" }),
+    UPTD: buatDataGrafikTahunan({ rows: bytahunRes.data, status: "UPTD" }),
+    BLKK: buatDataGrafikTahunan({ rows: bytahunRes.data, status: "BLKK" }),
+  };
+
+  const grafikTahunbyStatus = [2019, 2020].map((tahun) =>
+    buatObjekGabungan(bytahunRes.data, tahun, [
+      "LPKS",
+      "BLKLN",
+      "UPTD",
+      "BLKK",
+    ]),
+  );
+
+  console.log(grafikTahunbyStatus);
+
   return {
     period,
     label: period,
@@ -165,6 +287,9 @@ export async function fetchDashboardLPK(period: PeriodKey): Promise<DashboardDat
     verifikasiDelta: 0,
     byStatus: status,
     byProvinsi: byProvinsi,
+    byTahun: bytahunRes.data,
+    grafikTahun: grafikTahun,
+    GrafikGabunganRow: grafikTahunbyStatus,
   };
 }
 
@@ -172,14 +297,18 @@ export async function fetchDashboardAsesorData(
   period: PeriodKey,
   // No login yet, so this can't be tied to "the current assessor."
   // Once auth exists, pass the logged-in asesor's id here instead.
-  asesorId?: string
+  asesorId?: string,
 ): Promise<DashboardAsesorData> {
   // Fall back to the first assessor in the table so this at least
   // runs end to end before auth is wired up.
   let resolvedAsesorId = asesorId;
   let asesorName = "";
   if (!resolvedAsesorId) {
-    const { data } = await supabase.from("asesor").select("id, nama").limit(1).single();
+    const { data } = await supabase
+      .from("asesor")
+      .select("id, nama")
+      .limit(1)
+      .single();
     resolvedAsesorId = data?.id;
     asesorName = data?.nama ?? "";
   }
@@ -205,7 +334,7 @@ export async function fetchDashboardAsesorData(
       tglPenugasan: row["Tanggal Penugasan"],
       sla: "",
       status: row["Status"],
-    })
+    }),
   );
 
   const agendaList: AgendaItem[] = (agendaRes.data ?? []).map((row: any) => ({
@@ -230,7 +359,9 @@ export async function fetchDashboardAsesorData(
     asesorId: resolvedAsesorId ?? "",
     totalPenugasanAktif: penugasanAktifList.length,
     penugasanDeltaText: "",
-    sedangBerproses: penugasanAktifList.filter((p) => p.status === "Sedang Berproses").length,
+    sedangBerproses: penugasanAktifList.filter(
+      (p) => p.status === "Sedang Berproses",
+    ).length,
     sedangBerprosesPct: 0,
     selesai: penugasanAktifList.filter((p) => p.status === "Selesai").length,
     selesaiPct: 0,

@@ -1,7 +1,22 @@
+import { supabase } from "@/lib/supabaseClient";
+import { useState } from "react";
+
 export default function Profile(){ 
+
+    const [loading, setLoading] = useState(false);
+
+    const handleLogout = async () => {
+        setLoading(true);
+        const { error } = await supabase.auth.signOut();
+        if(error) {
+            setLoading(false);
+            console.error;
+        };
+    }
+
     return(
         <>
-        <div className="dropdown dropdown-end">
+        <div className= {`dropdown dropdown-end ${loading ? "dropdown-open" : ""}`} >
             <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                 <div className="w-10 rounded-full">
                 <img
@@ -19,7 +34,15 @@ export default function Profile(){
                 </a>
                 </li>
                 <li><a>Settings</a></li>
-                <li><a>Logout</a></li>
+                <li><button onClick={handleLogout} disabled={loading} className="w-full">
+                    {loading ? (
+                        <span className="loading loading-spinner loading-xs">Keluar...</span>
+                    ) : (
+                        <>
+                        <span>Logout</span>
+                        </>
+                    )}
+                </button></li>
             </ul>
         </div>
         </>

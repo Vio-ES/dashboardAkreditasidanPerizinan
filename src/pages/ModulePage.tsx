@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
@@ -9,13 +9,14 @@ import { useCreateModuleRow, useModuleData } from "@/hooks/useModuleData";
 import { Pagination } from "@/components/ui/Pagination";
 import { fetchAllModuleRows } from "@/lib/api/modules";
 import { toCSV } from "@/lib/utils";
+import { LembagaForm } from "@/components/forms/LembagaForm";
 
 export function ModulePage() {
   const { key = "" } = useParams();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const { data, isLoading } = useModuleData(key, page, pageSize);
-  
+
   const [modalOpen, setModalOpen] = useState(false);
   const { showToast } = useToast();
   const createRow = useCreateModuleRow(key);
@@ -23,7 +24,6 @@ export function ModulePage() {
   useEffect(() => {
     setPage(1);
   }, [key, pageSize]);
-
 
   if (isLoading || !data) {
     return (
@@ -35,7 +35,7 @@ export function ModulePage() {
   }
 
   const handleSubmit = async () => {
-    await createRow.mutateAsync({});
+    //await createRow.mutateAsync({});
     setModalOpen(false);
     showToast("Berhasil disimpan");
   };
@@ -47,7 +47,7 @@ export function ModulePage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = {key} + ".csv";
+    a.download = key + ".csv"; //mod-lpk.csv
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -78,19 +78,31 @@ export function ModulePage() {
           </button>
         </div>
 
-        <DataTable cols={data.cols} rows={data.rows} statusKey={data.statusKey} moduleKey={key}/>
-        <Pagination 
-          page={page} 
-          pageSize={pageSize} 
-          setPage={setPage} 
-          totalData={data?.count ?? 0}        
+        <DataTable
+          cols={data.cols}
+          rows={data.rows}
+          statusKey={data.statusKey}
+          moduleKey={key}
+        />
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          setPage={setPage}
+          totalData={data?.count ?? 0}
         />
       </div>
 
-      <Modal open={modalOpen} title={data.addLabel} onClose={() => setModalOpen(false)}>
-        <p className="mb-4 text-sm text-ink-soft">
-          Formulir ini adalah placeholder — sambungkan ke endpoint <code className="text-xs">POST /api/modules/{key}</code>{" "}
-          di <code className="text-xs">src/lib/api/modules.ts</code> saat backend siap.
+      <Modal
+        open={modalOpen}
+        title={data.addLabel}
+        onClose={() => setModalOpen(false)}
+      >
+        <LembagaForm onSuccess={() => setModalOpen(false)} />
+        {/** <p className="mb-4 text-sm text-ink-soft">
+          Formulir ini adalah placeholder — sambungkan ke endpoint{" "}
+          <code className="text-xs">POST /api/modules/{key}</code> di{" "}
+          <code className="text-xs">src/lib/api/modules.ts</code> saat backend
+          siap.
         </p>
         <button
           onClick={handleSubmit}
@@ -98,7 +110,7 @@ export function ModulePage() {
           className="w-full rounded-lg bg-blue px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
         >
           {createRow.isPending ? "Menyimpan..." : "Simpan"}
-        </button>
+        </button>**/}
       </Modal>
     </>
   );
