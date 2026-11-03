@@ -1,51 +1,396 @@
-import type { DashboardAsesorData, DashboardData, Notification, PeriodKey } from "@/types";
-import { DASHBOARD_ASESOR_DATA, DASHBOARD_DATA } from "@/data/staticData";
-
-// --- THE SWAP POINT ---
-// Right now this returns seeded mock data. When your backend is ready,
-// replace the body with something like:
+// src/lib/api/dashboard.ts
 //
-//   const res = await fetch(`/api/dashboard?period=${period}`);
-//   if (!res.ok) throw new Error("Failed to load dashboard data");
-//   return res.json();
+// THE SWAP POINT (now wired to Supabase — partial, worked example).
 //
-// No component that calls this function needs to change.
+// Three dashboards read from here:
+//   - fetchDashboardData      -> general/admin dashboard (DashboardData)
+//   - fetchDashboardLPK       -> LPK-facing view, same shape as above
+//                                (matches your original mock, which
+//                                 reused DASHBOARD_DATA for both)
+//   - fetchDashboardAsesorData -> assessor-facing dashboard
+//                                (DashboardAsesorData — a different,
+//                                 larger shape)
+//
+// `status`, `jenis`, `topProvinces`, `penugasanAktifList` and
+// `agendaList` below are real queries. Everything else is stubbed
+// with TODOs — same pattern as before, extend as needed.
 
-const SIMULATED_LATENCY_MS = 300;
+import type {
+  AgendaItem,
+  DashboardAsesorData,
+  DashboardData,
+  DashboardDataLembaga,
+  Notification,
+  PenugasanItem,
+  PeriodKey,
+  TahunStatusCount,
+} from "@/types";
+import { supabase } from "@/lib/supabaseClient";
 
-export async function fetchDashboardData(period: PeriodKey): Promise<DashboardData> {
-  await delay(SIMULATED_LATENCY_MS);
-  const data = DASHBOARD_DATA[period];
-  if (!data) throw new Error(`Unknown period: ${period}`);
-  return data;
+function periodToDateRange(period: PeriodKey): { from: string; to: string } {
+  const ranges: Record<PeriodKey, { from: string; to: string }> = {
+    mei2026: { from: "2026-05-01", to: "2026-05-31" },
+    apr2026: { from: "2026-04-01", to: "2026-04-30" },
+    mar2026: { from: "2026-03-01", to: "2026-03-31" },
+    q2026: { from: "2026-01-01", to: "2026-03-31" },
+    y2020: { from: "2020-01-01", to: "2020-12-31" },
+    y2026: { from: "2026-01-01", to: "2026-12-31" },
+  };
+  return ranges[period];
 }
 
-export async function fetchDashboardAsesorData(period: PeriodKey): Promise<DashboardAsesorData> {
-  await delay(SIMULATED_LATENCY_MS);
-  const data = DASHBOARD_ASESOR_DATA[period];
-  if (!data) throw new Error(`Unknown period: ${period}`);
-  return data;
-}
-
-export async function fetchDashboardLPK(period: PeriodKey): Promise<DashboardData> {
-  await delay(SIMULATED_LATENCY_MS);
-  const data = DASHBOARD_DATA[period];
-  if (!data) throw new Error(`Unknown period: ${period}`);
-  return data;
-}
-
-const MOCK_NOTIFICATIONS: Notification[] = [
-  { id: "n1", title: "5 pengajuan baru menunggu verifikasi", time: "10 menit lalu", read: false },
-  { id: "n2", title: "SLA pengajuan AKR-2026-0142 akan terlampaui besok", time: "1 jam lalu", read: false },
-  { id: "n3", title: "Sertifikat SERT-2026-0703 telah diterbitkan", time: "3 jam lalu", read: true },
-  { id: "n4", title: "Asesor Budi Santoso menyelesaikan asesmen lapangan", time: "Kemarin", read: true },
+const PALETTE = [
+  "#15406A", // Biru tua: primary
+  "#56849F", // Biru sedang: secondary
+  "#A0BECD", // Biru muda: info
+  "#65A853", // Hijau: success
+  "#B88735", // Emas kecokelatan: warning
 ];
 
-export async function fetchNotifications(): Promise<Notification[]> {
-  await delay(SIMULATED_LATENCY_MS);
-  return MOCK_NOTIFICATIONS;
+function groupBy<T extends Record<string, unknown>>(
+  rows: T[] | null,
+  key: keyof T,
+): { label: string; value: number }[] {
+  const counts = new Map<string, number>();
+  for (const row of rows ?? []) {
+    const label = String(row[key]);
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  }
+  return Array.from(counts, ([label, value]) => ({ label, value }));
 }
 
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+export interface ObjekTahun {
+  rows: TahunStatusCount[];
+  status: string;
+  tahun: number;
+}
+
+function buatObjekTahun({ rows, status, tahun }: ObjekTahun) {
+  const hasilFilter = rows
+    .filter((d) => d.status == status)
+    .filter((n) => n.tahun_akreditasi == tahun);
+
+  const objectGrafik = {
+    tahun: tahun,
+    Terakreditasi:
+      hasilFilter.find(
+        (m) => m.status_akreditasi_kelembagaan === "Terakreditasi",
+      )?.value ?? 0,
+    "Belum Terakreditasi":
+      hasilFilter.find(
+        (m) => m.status_akreditasi_kelembagaan === "Belum Terakreditasi",
+      )?.value ?? 0,
+    "Belum Ada Data":
+      hasilFilter.find(
+        (m) => m.status_akreditasi_kelembagaan === "Belum Ada Data",
+      )?.value ?? 0,
+  };
+
+  return objectGrafik;
+}
+
+function buatObjekGabungan(
+  rows: TahunStatusCount[],
+  tahun: number,
+  daftarLembaga: string[],
+) {
+  const daftarStatus = [
+    "Terakreditasi",
+    "Belum Terakreditasi",
+    "Belum Ada Data",
+  ];
+  const hasil: Record<string, number> = { tahun };
+
+  daftarLembaga.forEach((lembaga) => {
+    const baris = rows
+      .filter((d) => d.status === lembaga)
+      .filter((d) => d.tahun_akreditasi === tahun);
+
+    daftarStatus.forEach((status) => {
+      hasil[lembaga + "_" + status.replace(/ /g, "")] =
+        baris.find((m) => m.status_akreditasi_kelembagaan === status)?.value ??
+        0;
+    });
+  });
+
+  return hasil;
+}
+
+function buatDataGrafikTahunan({
+  rows,
+  status,
+}: {
+  rows: TahunStatusCount[];
+  status: string;
+}) {
+  const tahun = [2019, 2020];
+  const data = tahun.map((t) =>
+    buatObjekTahun({ rows: rows, status: status, tahun: t }),
+  );
+
+  return data;
+}
+
+export async function fetchDashboardData(
+  period: PeriodKey,
+): Promise<DashboardData> {
+  const { from, to } = periodToDateRange(period);
+
+  const [statusRes, jenisRes, provincesRes] = await Promise.all([
+    supabase
+      .from("pengajuan")
+      .select("status")
+      .gte("tanggal_ajuan", from)
+      .lte("tanggal_ajuan", to),
+    supabase
+      .from("pengajuan")
+      .select("jenis_layanan")
+      .gte("tanggal_ajuan", from)
+      .lte("tanggal_ajuan", to),
+    supabase.from("v_dashboard_top_provinces").select("*"),
+  ]);
+
+  if (statusRes.error) throw new Error(statusRes.error.message);
+  if (jenisRes.error) throw new Error(jenisRes.error.message);
+  if (provincesRes.error) throw new Error(provincesRes.error.message);
+
+  const status = groupBy(statusRes.data, "status");
+  const jenis = groupBy(jenisRes.data, "jenis_layanan");
+
+  // TODO: replace placeholders with real queries the same way —
+  // biaya (group pembiayaan by sumber_dana), sla/slaOver (compare
+  // sla_deadline to today), trend (v_dashboard_trend), process
+  // (count per tahap), workload, and the *Delta fields (compare to
+  // the previous period's counts).
+  return {
+    period,
+    label: period,
+    asOfDate: new Date().toISOString().slice(0, 10),
+    lpk: 0,
+    lpkDelta: 0,
+    akreditasi: status.reduce((sum, s) => sum + s.value, 0),
+    akreditasiDelta: 0,
+    aktif: status.find((s) => s.label === "Sedang Berproses")?.value ?? 0,
+    aktifDelta: 0,
+    sertifikat: status.find((s) => s.label === "Selesai")?.value ?? 0,
+    sertifikatDelta: 0,
+    asesor: 0,
+    asesorNote: 0,
+    jenis: jenis.map((j, i) => ({ ...j, color: PALETTE[i % PALETTE.length] })),
+    status: status.map((s, i) => ({
+      ...s,
+      color: PALETTE[i % PALETTE.length],
+    })),
+    biaya: [],
+    sla: 0,
+    slaOver: 0,
+    trend: [],
+    trendMonths: [],
+    topProvinces: provincesRes.data ?? [],
+    process: [],
+    workload: "",
+  };
+}
+
+// Your original mock reused the same DashboardData for the LPK view —
+// keeping that here. Split this into its own query later if the LPK
+// dashboard should show LPK-scoped data instead of the global view.
+export async function fetchDashboardLPK(
+  period: PeriodKey,
+): Promise<DashboardDataLembaga> {
+  const [
+    totalRes,
+    terverifikasiRes,
+    terakreditasiRes,
+    statusRes,
+    trendRes,
+    provinsiRes,
+    bytahunRes,
+  ] = await Promise.all([
+    supabase.from("lpk_bersih").select("*", { count: "exact", head: true }),
+    supabase
+      .from("lpk_bersih")
+      .select("*", { count: "exact", head: true })
+      .eq("status_verifikasi_kelembagaan", "Terverifikasi"),
+    supabase
+      .from("lpk_bersih")
+      .select("*", { count: "exact", head: true })
+      .eq("status_akreditasi_kelembagaan", "Terakreditasi"),
+    supabase
+      .from("v_dashboard_lpk_by_status")
+      .select("*")
+      .order("status", { ascending: true }),
+    supabase
+      .from("v_dashboard_lpk_months")
+      .select("*")
+      .order("bulan", { ascending: false })
+      .limit(12),
+    supabase
+      .from("v_dashboard_lpk_by_provinsi")
+      .select("*")
+      .order("value", { ascending: false }),
+    supabase
+      .from("v_dashboard_lpk_by_tahun")
+      .select("*")
+      .order("tahun_akreditasi", { ascending: true })
+      .order("status", { ascending: true }),
+  ]);
+
+  if (totalRes.error) throw new Error(totalRes.error.message);
+  if (terverifikasiRes.error) throw new Error(terverifikasiRes.error.message);
+  if (terakreditasiRes.error) throw new Error(terakreditasiRes.error.message);
+  if (statusRes.error) throw new Error(statusRes.error.message);
+  if (trendRes.error) throw new Error(trendRes.error.message);
+  if (provinsiRes.error) throw new Error(provinsiRes.error.message);
+  if (bytahunRes.error) throw new Error(bytahunRes.error.message);
+
+  const status = statusRes.data.map((row, i) => ({
+    label: row.status,
+    value: row.value,
+    color: PALETTE[i % PALETTE.length],
+  }));
+  const byProvinsi = provinsiRes.data.map((row) => ({
+    province: row.provinsi,
+    count: row.value,
+  }));
+
+  const verifikasi = terverifikasiRes.count ?? 0;
+  const akreditasi = terakreditasiRes.count ?? 0;
+
+  const grafikTahun = {
+    LPKS: buatDataGrafikTahunan({ rows: bytahunRes.data, status: "LPKS" }),
+    BLKLN: buatDataGrafikTahunan({ rows: bytahunRes.data, status: "BLKLN" }),
+    UPTD: buatDataGrafikTahunan({ rows: bytahunRes.data, status: "UPTD" }),
+    BLKK: buatDataGrafikTahunan({ rows: bytahunRes.data, status: "BLKK" }),
+  };
+
+  const grafikTahunbyStatus = [2019, 2020].map((tahun) =>
+    buatObjekGabungan(bytahunRes.data, tahun, [
+      "LPKS",
+      "BLKLN",
+      "UPTD",
+      "BLKK",
+    ]),
+  );
+
+  console.log(grafikTahunbyStatus);
+
+  return {
+    period,
+    label: period,
+    asOfDate: new Date().toISOString().slice(0, 10),
+    lpk: totalRes.count ?? 0,
+    lpkDelta: 0,
+    akreditasi: akreditasi,
+    akreditasiDelta: 0,
+    verifikasi: verifikasi,
+    verifikasiDelta: 0,
+    byStatus: status,
+    byProvinsi: byProvinsi,
+    byTahun: bytahunRes.data,
+    grafikTahun: grafikTahun,
+    GrafikGabunganRow: grafikTahunbyStatus,
+  };
+}
+
+export async function fetchDashboardAsesorData(
+  period: PeriodKey,
+  // No login yet, so this can't be tied to "the current assessor."
+  // Once auth exists, pass the logged-in asesor's id here instead.
+  asesorId?: string,
+): Promise<DashboardAsesorData> {
+  // Fall back to the first assessor in the table so this at least
+  // runs end to end before auth is wired up.
+  let resolvedAsesorId = asesorId;
+  let asesorName = "";
+  if (!resolvedAsesorId) {
+    const { data } = await supabase
+      .from("asesor")
+      .select("id, nama")
+      .limit(1)
+      .single();
+    resolvedAsesorId = data?.id;
+    asesorName = data?.nama ?? "";
+  }
+
+  const [penugasanRes, agendaRes] = await Promise.all([
+    supabase
+      .from("v_mod_penugasan")
+      .select("*")
+      .eq("Asesor Ditugaskan", asesorName),
+    supabase
+      .from("agenda")
+      .select("id, tanggal, waktu, judul, kategori")
+      .eq("asesor_id", resolvedAsesorId ?? ""),
+  ]);
+
+  const penugasanAktifList: PenugasanItem[] = (penugasanRes.data ?? []).map(
+    (row: any, i: number) => ({
+      no: i + 1,
+      kodePenugasan: row["ID Pengajuan"],
+      lpk: row["Nama LPK"],
+      jenisLayanan: "Akreditasi Baru",
+      tahap: "Verifikasi",
+      tglPenugasan: row["Tanggal Penugasan"],
+      sla: "",
+      status: row["Status"],
+    }),
+  );
+
+  const agendaList: AgendaItem[] = (agendaRes.data ?? []).map((row: any) => ({
+    id: row.id,
+    date: row.tanggal,
+    time: row.waktu,
+    title: row.judul,
+    category: row.kategori,
+  }));
+
+  // TODO: everything below is a placeholder. Replace with real
+  // aggregate queries the same way fetchDashboardData does —
+  // bebanKerjaSaya/penugasanStatus (group penugasan by status),
+  // sla figures (compare sla_deadline to today for this asesor),
+  // trendPerformance (monthly counts), kinerjaDimensi (needs a
+  // scoring source you haven't defined yet).
+  return {
+    period,
+    label: period,
+    asOfDate: new Date().toISOString().slice(0, 10),
+    asesorName,
+    asesorId: resolvedAsesorId ?? "",
+    totalPenugasanAktif: penugasanAktifList.length,
+    penugasanDeltaText: "",
+    sedangBerproses: penugasanAktifList.filter(
+      (p) => p.status === "Sedang Berproses",
+    ).length,
+    sedangBerprosesPct: 0,
+    selesai: penugasanAktifList.filter((p) => p.status === "Selesai").length,
+    selesaiPct: 0,
+    rataRataSla: 0,
+    slaStatusText: "",
+    kinerjaAsesmenScore: 0,
+    bebanKerjaSaya: [],
+    penugasanStatus: [],
+    slaGaugePct: 0,
+    slaTerlampauiCount: 0,
+    trendPerformance: [],
+    trendMonths: [],
+    kinerjaDimensi: [],
+    penugasanAktifList,
+    agendaList,
+  };
+}
+
+export async function fetchNotifications(): Promise<Notification[]> {
+  const { data, error } = await supabase
+    .from("notifikasi")
+    .select("id, judul, dibuat_pada, dibaca")
+    .order("dibuat_pada", { ascending: false })
+    .limit(20);
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((n) => ({
+    id: n.id,
+    title: n.judul,
+    time: n.dibuat_pada,
+    read: n.dibaca,
+  }));
 }

@@ -3,6 +3,7 @@ import { ChevronDown, Landmark } from "lucide-react";
 import { PERIOD_OPTIONS } from "@/data/staticData";
 import type { PeriodKey } from "@/types";
 import { cn } from "@/lib/utils";
+import Profile from "../ui/Profile";
 
 interface TopbarProps {
   title: string;
@@ -71,7 +72,7 @@ export function Topbar({ title, subtitle, period, onPeriodChange }: TopbarProps)
           </div>
         )}
 
-        <div className="hidden items-center gap-2 border-l border-line pl-3 lg:flex">
+        <div className="hidden items-center gap-2 border-l border-line pl-3 md:flex">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-navy text-white">
             <Landmark size={16} />
           </div>
@@ -82,6 +83,7 @@ export function Topbar({ title, subtitle, period, onPeriodChange }: TopbarProps)
             <br />
             REPUBLIK INDONESIA
           </div>
+          <Profile/>
         </div>
       </div>
     </div>

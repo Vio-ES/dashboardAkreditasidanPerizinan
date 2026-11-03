@@ -3,7 +3,36 @@
 // conform to these types — that's what makes swapping them a
 // one-file change instead of a rewrite.
 
-export type PeriodKey = "mei2026" | "apr2026" | "mar2026" | "q2026" | "y2026";
+export const STATUS_OPTIONS = ["UPTD", "LPKS", "BLKLN", "BLKK"] as const;
+
+export type Status = (typeof STATUS_OPTIONS)[number];
+
+export interface Province {
+  id: number;
+  nama: string;
+}
+
+export interface KabupatenKota {
+  id: number;
+  provinsi_id: number;
+  nama: string;
+}
+
+export const STATUS_AKREDITASI_LEMBAGA_OPTIONS = [
+  "Terakreditasi",
+  "Belum Terakreditasi",
+] as const;
+
+export type StatusAkreditasiLembaga =
+  (typeof STATUS_AKREDITASI_LEMBAGA_OPTIONS)[number];
+
+export type PeriodKey =
+  | "mei2026"
+  | "apr2026"
+  | "mar2026"
+  | "q2026"
+  | "y2020"
+  | "y2026";
 
 export interface PeriodOption {
   key: PeriodKey;
@@ -25,6 +54,20 @@ export interface ProcessStep {
 export interface ProvinceCount {
   province: string;
   count: number;
+}
+
+export interface TahunStatusCount {
+  tahun_akreditasi: number;
+  status: string;
+  status_akreditasi_kelembagaan: string;
+  value: number;
+}
+
+export interface GrafikTahunRow {
+  tahun: number;
+  Terakreditasi: number;
+  "Belum Terakreditasi": number;
+  "Belum Ada Data": number;
 }
 
 export interface DashboardData {
@@ -56,6 +99,24 @@ export interface DashboardData {
   topProvinces: ProvinceCount[];
   process: ProcessStep[];
   workload: string;
+}
+
+export interface DashboardDataLembaga {
+  period: PeriodKey;
+  label: string;
+  asOfDate: string;
+
+  lpk: number;
+  lpkDelta: number;
+  akreditasi: number;
+  akreditasiDelta: number;
+  verifikasi: number;
+  verifikasiDelta: number;
+  byStatus: ChartSlice[];
+  byProvinsi: ProvinceCount[];
+  byTahun: TahunStatusCount[];
+  grafikTahun: Record<"LPKS" | "BLKLN" | "UPTD" | "BLKK", GrafikTahunRow[]>;
+  GrafikGabunganRow: Record<string, number>[];
 }
 
 // --- Tipe Data Tabel Penugasan Aktif Asesor ---
@@ -103,11 +164,11 @@ export interface DashboardAsesorData {
   period: PeriodKey;
   label: string;
   asOfDate: string;
-  
+
   // Header / Profil Info
   asesorName: string;
   asesorId: string;
-  
+
   // Top Stats
   totalPenugasanAktif: number;
   penugasanDeltaText: string;
@@ -118,18 +179,18 @@ export interface DashboardAsesorData {
   rataRataSla: number;
   slaStatusText: string;
   kinerjaAsesmenScore: number; // e.g., 4.8
-  
+
   // Charts
   bebanKerjaSaya: ChartSlice[];
   penugasanStatus: ChartSlice[];
   slaGaugePct: number;
   slaTerlampauiCount: number;
-  
+
   // Tren & Dimensi Kinerja
   trendPerformance: number[];
   trendMonths: string[];
   kinerjaDimensi: KinerjaDimensi[];
-  
+
   // Widgets Data
   penugasanAktifList: PenugasanItem[];
   agendaList: AgendaItem[];
@@ -160,3 +221,5 @@ export interface ModuleDefinition {
 export interface ModuleData extends ModuleDefinition {
   rows: ModuleRow[];
 }
+
+export type SortRule = { column: string; ascending: boolean };
