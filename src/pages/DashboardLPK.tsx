@@ -9,6 +9,7 @@ import type { PeriodKey } from "@/types";
 import { Panel } from "@/components/ui/Panel";
 import { ProvinceChart } from "@/components/charts/ProvinceChart";
 import { GrafikLembagaGabungan } from "@/components/charts/GrafikLembagaGabungan";
+import { MapIndonesia } from "@/components/charts/MapIndonesia";
 
 const STATUS_PEMERINTAH = ["UPTD", "BLKK"];
 const STATUS_SWASTA = ["LPKS", "BLKLN"];
@@ -50,10 +51,6 @@ export function DashboardLPK() {
     (accumulator, currentValue) => accumulator + currentValue.value,
     0,
   );
-
-  {
-    data.byProvinsi.map((d) => console.log(d));
-  }
 
   return (
     <>
@@ -144,9 +141,7 @@ export function DashboardLPK() {
               title="Sebaran Lembaga Per Provinsi Indonesia"
               onMore={() => navigate("/modul/mod-lpk")}
             >
-              <div className="space-y-3">
-                <ProvinceChart data={data.byProvinsi.slice(0, 5)} />
-              </div>
+              <MapIndonesia dataProvinsi={data.byProvinsi} />
             </Panel>
           )}
         </div>

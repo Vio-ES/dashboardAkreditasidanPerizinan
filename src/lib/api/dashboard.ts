@@ -273,8 +273,6 @@ export async function fetchDashboardLPK(
     ]),
   );
 
-  console.log(grafikTahunbyStatus);
-
   return {
     period,
     label: period,
