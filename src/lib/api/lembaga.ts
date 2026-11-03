@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import { LembagaFormData } from "@/types";
 
 export async function fetchLembagaDetail(id: string) {
   const { data, error } = await supabase

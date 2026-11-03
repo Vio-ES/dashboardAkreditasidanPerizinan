@@ -10,6 +10,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { fetchAllModuleRows } from "@/lib/api/modules";
 import { toCSV } from "@/lib/utils";
 import { LembagaForm } from "@/components/forms/LembagaForm";
+import { LembagaFormData } from "@/types";
 
 export function ModulePage() {
   const { key = "" } = useParams();
@@ -19,6 +20,7 @@ export function ModulePage() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const { showToast } = useToast();
+
   const createRow = useCreateModuleRow(key);
 
   useEffect(() => {
@@ -34,8 +36,8 @@ export function ModulePage() {
     );
   }
 
-  const handleSubmit = async () => {
-    //await createRow.mutateAsync({});
+  const handleSubmit = async (lembaga: LembagaFormData) => {
+    await createRow.mutateAsync(lembaga);
     setModalOpen(false);
     showToast("Berhasil disimpan");
   };
@@ -97,7 +99,7 @@ export function ModulePage() {
         title={data.addLabel}
         onClose={() => setModalOpen(false)}
       >
-        <LembagaForm onSuccess={() => setModalOpen(false)} />
+        <LembagaForm onSubmit={handleSubmit} />
         {/** <p className="mb-4 text-sm text-ink-soft">
           Formulir ini adalah placeholder — sambungkan ke endpoint{" "}
           <code className="text-xs">POST /api/modules/{key}</code> di{" "}

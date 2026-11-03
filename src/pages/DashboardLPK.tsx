@@ -13,10 +13,12 @@ import { GrafikLembagaGabungan } from "@/components/charts/GrafikLembagaGabungan
 const STATUS_PEMERINTAH = ["UPTD", "BLKK"];
 const STATUS_SWASTA = ["LPKS", "BLKLN"];
 const JENIS_LEMBAGA = ["LPKS", "BLKLN", "UPTD", "BLKK"];
+type grafik = "bar" | "peta";
 
 export function DashboardLPK() {
   const [period, setPeriod] = useState<PeriodKey>("y2020");
   const { data, isLoading } = useDashboardLPK(period);
+  const [grafik, setGrafik] = useState<grafik>("bar");
   const { data: notifications } = useNotifications();
   const navigate = useNavigate();
 
@@ -48,6 +50,10 @@ export function DashboardLPK() {
     (accumulator, currentValue) => accumulator + currentValue.value,
     0,
   );
+
+  {
+    data.byProvinsi.map((d) => console.log(d));
+  }
 
   return (
     <>
@@ -106,17 +112,43 @@ export function DashboardLPK() {
           </div>
         </div>
 
-        {/* Trend + top provinces */}
-        <div className="">
-          <Panel
-            title="Jumlah Lembaga Per Provinsi Top 5"
-            onMore={() => navigate("/modul/mod-lpk")}
-          >
-            <div className="space-y-3">
-              {/* delete the slice for all data shown */}
-              <ProvinceChart data={data.byProvinsi.slice(0, 5)} />
-            </div>
-          </Panel>
+        {/* Sebaran + top provinces */}
+        <div className="bg-white rounded-md">
+          <div className="flex gap-3 p-4">
+            <button
+              onClick={() => setGrafik("bar")}
+              className="btn btn-sm active:btn-accent"
+            >
+              Bar
+            </button>
+            <button
+              onClick={() => setGrafik("peta")}
+              className="btn btn-sm active:btn-accent"
+            >
+              Peta
+            </button>
+          </div>
+          {grafik === "bar" && (
+            <Panel
+              title="Jumlah Lembaga Per Provinsi Top 5"
+              onMore={() => navigate("/modul/mod-lpk")}
+            >
+              <div className="space-y-3">
+                {/* delete the slice for all data shown */}
+                <ProvinceChart data={data.byProvinsi.slice(0, 5)} />
+              </div>
+            </Panel>
+          )}
+          {grafik === "peta" && (
+            <Panel
+              title="Sebaran Lembaga Per Provinsi Indonesia"
+              onMore={() => navigate("/modul/mod-lpk")}
+            >
+              <div className="space-y-3">
+                <ProvinceChart data={data.byProvinsi.slice(0, 5)} />
+              </div>
+            </Panel>
+          )}
         </div>
 
         <div className="flex flex-col gap-1 pb-2 text-xs text-ink-faint sm:flex-row sm:items-center sm:justify-between">

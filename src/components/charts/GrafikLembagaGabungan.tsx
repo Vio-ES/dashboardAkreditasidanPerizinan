@@ -48,7 +48,6 @@ export function GrafikLembagaGabungan({ data }: GrafikLembagaGabunganProps) {
       ? terpilih.filter((b) => b !== tombol)
       : [...terpilih, tombol];
     func(baru.length === 0 ? kelompok : baru);
-    console.log(baru);
   }
 
   return (

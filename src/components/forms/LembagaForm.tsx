@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import {
+  LembagaFormData,
   Status,
   STATUS_AKREDITASI_LEMBAGA_OPTIONS,
   STATUS_OPTIONS,
@@ -8,23 +9,11 @@ import {
 } from "@/types";
 import { useKabupatenKota, useProvinces } from "@/hooks/useProvinces";
 
-interface LembagaFormData {
-  vin: number;
-  nama_lembaga: string;
-  status: Status;
-  alamat: string;
-  provinsi: string;
-  kabupaten_kota: string;
-  status_akreditasi_kelembagaan: StatusAkreditasiLembaga;
-  tahun_akreditasi: number;
-  list_program: string[];
-}
-
 interface LembagaFormProps {
-  onSuccess: () => void;
+  onSubmit: (data: LembagaFormData) => void;
 }
 
-export function LembagaForm({ onSuccess }: LembagaFormProps) {
+export function LembagaForm({ onSubmit }: LembagaFormProps) {
   const [formData, setFormData] = useState<LembagaFormData>({
     vin: 0,
     nama_lembaga: "",
@@ -80,7 +69,7 @@ export function LembagaForm({ onSuccess }: LembagaFormProps) {
 
     // Frontend saja
     console.log("Data Form:", formData);
-    onSuccess();
+    onSubmit(formData);
   };
 
   return (
