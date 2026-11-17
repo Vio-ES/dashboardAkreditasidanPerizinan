@@ -89,7 +89,7 @@ export function LembagaForm({ onSubmit }: LembagaFormProps) {
             value={formData.vin || ""}
             onChange={handleChange}
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-[#15406A]"
+            className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-[#15406A]"
           />
         </div>
 
@@ -104,7 +104,7 @@ export function LembagaForm({ onSubmit }: LembagaFormProps) {
             onChange={handleChange}
             required
             placeholder="Masukkan nama lembaga"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-[#15406A]"
+            className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-[#15406A]"
           />
         </div>
 
@@ -117,7 +117,7 @@ export function LembagaForm({ onSubmit }: LembagaFormProps) {
             value={formData.status}
             onChange={handleChange}
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+            className="w-full rounded-lg border border-border px-3 py-2"
           >
             <option value="">Pilih Status</option>
             {STATUS_OPTIONS.map((s) => (
@@ -139,7 +139,7 @@ export function LembagaForm({ onSubmit }: LembagaFormProps) {
             rows={4}
             required
             placeholder="Masukkan alamat lengkap"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-[#15406A]"
+            className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-[#15406A]"
           />
         </div>
 
@@ -153,7 +153,7 @@ export function LembagaForm({ onSubmit }: LembagaFormProps) {
               value={formData.provinsi}
               onChange={handleChange}
               required
-              className="w-full rounded-lg border border-gray-300 px-3 py-2"
+              className="w-full rounded-lg border border-border px-3 py-2"
             >
               <option value="">Pilih Provinsi</option>
               {provinces.map((province) => (
@@ -176,7 +176,7 @@ export function LembagaForm({ onSubmit }: LembagaFormProps) {
               onChange={handleChange}
               required
               disabled={!formData.provinsi}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2"
+              className="w-full rounded-lg border border-border px-3 py-2"
             >
               <option value="">Pilih Kabupaten / Kota</option>
 
@@ -200,7 +200,7 @@ export function LembagaForm({ onSubmit }: LembagaFormProps) {
             value={formData.status_akreditasi_kelembagaan}
             onChange={handleChange}
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+            className="w-full rounded-lg border border-border px-3 py-2"
           >
             <option value="">Pilih Status Akreditasi</option>
 
@@ -225,7 +225,7 @@ export function LembagaForm({ onSubmit }: LembagaFormProps) {
             onChange={handleChange}
             min="1900"
             max="2100"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+            className="w-full rounded-lg border border-border px-3 py-2"
           />
         </div>
 
@@ -239,7 +239,7 @@ export function LembagaForm({ onSubmit }: LembagaFormProps) {
               value={programInput}
               onChange={(e) => setProgramInput(e.target.value)}
               placeholder="Masukkan nama program"
-              className="flex-1 rounded-lg border border-gray-300 px-3 py-2"
+              className="flex-1 rounded-lg border border-border px-3 py-2"
             />
 
             <button

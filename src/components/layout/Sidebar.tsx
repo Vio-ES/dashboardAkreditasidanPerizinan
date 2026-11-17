@@ -4,7 +4,8 @@ import type { LucideIcon } from "lucide-react";
 import { LayoutDashboard, X } from "lucide-react";
 import { useModuleDefinitions } from "@/hooks/useModuleData";
 import { fmt, cn } from "@/lib/utils";
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
+import { UserContext } from "@/lib/AuthContext";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const role = useContext(UserContext);
   const { data: modules } = useModuleDefinitions();
 
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -30,7 +32,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     if (!isOpen) return;
 
     const handleClickOutside = (e: MouseEvent) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(e.target as Node)
+      ) {
         onClose();
       }
     };
@@ -43,52 +48,77 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     <>
       {isOpen && <div className="fixed inset-0 bg-black/40 z-20 lg:hidden" />}
 
-      <aside 
-      ref={sidebarRef}
-      className={`fixed lg:sticky top-0 z-30 flex h-dvh w-[250px] flex-shrink-0 flex-col overflow-y-auto bg-gradient-to-b from-navy to-[#0a1630] text-[#cdd6ec] transform transition-transform duration-300
+      <aside
+        ref={sidebarRef}
+        className={`fixed lg:sticky top-0 z-30 flex h-dvh w-[250px] flex-shrink-0 flex-col overflow-y-auto bg-gradient-to-b from-navy to-[#0a1630] text-[#cdd6ec] transform transition-transform duration-300
       ${isOpen ? "translate-x-0" : "-translate-x-full"}
-      lg:translate-x-0`}>
+      lg:translate-x-0`}
+      >
         <div className="flex items-center gap-2.5 border-b border-white/10 px-[18px] py-5">
           <div className="flex h-[38px] w-[38px] flex-shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#4c7bff] to-[#2447a8] shadow-[0_4px_10px_rgba(47,111,237,.35)]">
             <LayoutDashboard size={19} className="text-white" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-[15.5px] font-extrabold leading-tight text-white">SI-LEMLATVOK</div>
-            <div className="mt-0.5 truncate text-[10.5px] text-[#8fa0cc]">Sistem Akreditasi Lembaga Vokasi</div>
+            <div className="truncate text-[15.5px] font-extrabold leading-tight text-white">
+              SI-LEMLATVOK
+            </div>
+            <div className="mt-0.5 truncate text-[10.5px] text-[#8fa0cc]">
+              Sistem Akreditasi Lembaga Vokasi
+            </div>
           </div>
           <div className="flex-shrink-0 p-1 text-white md:hidden">
-          <button onClick={onClose}>
-            <X size={20} />
-          </button>
-        </div>
+            <button onClick={onClose}>
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         <nav className="flex-1 px-3 pb-5 pt-3.5">
-
           <ul className="menu bg-base-200 rounded-box w-56 bg-transparent">
             <li>
               <details open>
                 <summary>Dashboard</summary>
                 <ul>
                   <li>
-                    <NavItem to="/dashboard" label="Dashboard" icon={LayoutDashboard} end />
+                    {role === "admin" && (
+                      <NavItem
+                        to="/dashboard"
+                        label="Dashboard"
+                        icon={LayoutDashboard}
+                        end
+                      />
+                    )}
                   </li>
                   <li>
-                    <NavItem to="/dashboardassesor" label="Dashboard Assesor" icon={LayoutDashboard} end />
+                    {role === "asesor" && (
+                      <NavItem
+                        to="/dashboardassesor"
+                        label="Dashboard Assesor"
+                        icon={LayoutDashboard}
+                        end
+                      />
+                    )}
                   </li>
                   <li>
-                    <NavItem to="/dashboardLPK" label="Dashboard LPK" icon={LayoutDashboard} end />
+                    <NavItem
+                      to="/dashboardLPK"
+                      label="Dashboard LPK"
+                      icon={LayoutDashboard}
+                      end
+                    />
                   </li>
                 </ul>
               </details>
             </li>
           </ul>
-          
+
           <div className="mb-2 mt-4 px-2.5 text-[10.5px] font-bold uppercase tracking-wider text-[#5c6fa0]">
             Modul
           </div>
           {modules?.map((m) => {
-            const Icon = (Icons[m.icon as keyof typeof Icons] as LucideIcon) ?? Icons.Circle;
+            const Icon =
+              (Icons[m.icon as keyof typeof Icons] as LucideIcon) ??
+              Icons.Circle;
             return (
               <NavItem
                 key={m.key}
@@ -107,7 +137,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
       </aside>
     </>
-
   );
 }
 
@@ -127,14 +156,18 @@ function NavItem({ to, label, icon: Icon, badge, end }: NavItemProps) {
       className={({ isActive }) =>
         cn(
           "mb-0.5 flex w-full items-center gap-2.5 rounded-[10px] px-3 py-2.5 text-[13.6px] font-semibold text-white bg-transparent transition-colors",
-          isActive ? "bg-accent shadow-[0_4px_12px_-2px_rgba(47,111,237,.5)]" : " hover:bg-second hover:text-white"
+          isActive
+            ? "bg-accent shadow-[0_4px_12px_-2px_rgba(47,111,237,.5)]"
+            : " hover:bg-second hover:text-white",
         )
       }
     >
       <Icon size={17} strokeWidth={2} className="flex-shrink-0 opacity-90" />
       <span className="flex-1">{label}</span>
       {typeof badge === "number" && (
-        <span className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-bold">{fmt(badge)}</span>
+        <span className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-bold">
+          {fmt(badge)}
+        </span>
       )}
     </NavLink>
   );

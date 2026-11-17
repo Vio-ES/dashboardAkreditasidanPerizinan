@@ -222,7 +222,7 @@ export interface ModuleDefinition {
   navLabel: string;
   title: string;
   sub: string;
-  addLabel: string;
+  addLabel?: string;
   cols: string[];
   statusKey: string;
   icon: string; // lucide-react icon name

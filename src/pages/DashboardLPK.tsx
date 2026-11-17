@@ -30,7 +30,7 @@ export function DashboardLPK() {
           title="Dashboard Nasional Akreditasi LPK"
           subtitle="Memuat data..."
         />
-        <div className="flex-1 p-6 text-sm text-ink-faint">
+        <div className="flex-1 p-6 text-sm text-ink-faint bg-[#F4F7FA]">
           Memuat dashboard...
         </div>
       </>
@@ -61,7 +61,7 @@ export function DashboardLPK() {
         onPeriodChange={setPeriod}
       />
 
-      <div className="flex-1 space-y-6 p-6">
+      <div className="flex-1 space-y-6 p-6 bg-[#F4F7FA]">
         {/* Stat cards */}
         <div className="flex overflow-x-auto gap-2.5 snap-x snap-mandatory lg:grid lg:gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard
@@ -132,7 +132,7 @@ export function DashboardLPK() {
             >
               <div className="space-y-3">
                 {/* delete the slice for all data shown */}
-                <ProvinceChart data={data.byProvinsi.slice(0, 5)} />
+                <ProvinceChart data={data.byProvinsi.slice(0, 10)} />
               </div>
             </Panel>
           )}
