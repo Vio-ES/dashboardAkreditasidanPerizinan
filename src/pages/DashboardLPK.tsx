@@ -9,14 +9,17 @@ import type { PeriodKey } from "@/types";
 import { Panel } from "@/components/ui/Panel";
 import { ProvinceChart } from "@/components/charts/ProvinceChart";
 import { GrafikLembagaGabungan } from "@/components/charts/GrafikLembagaGabungan";
+import { MapIndonesia } from "@/components/charts/MapIndonesia";
 
 const STATUS_PEMERINTAH = ["UPTD", "BLKK"];
 const STATUS_SWASTA = ["LPKS", "BLKLN"];
 const JENIS_LEMBAGA = ["LPKS", "BLKLN", "UPTD", "BLKK"];
+type grafik = "bar" | "peta";
 
 export function DashboardLPK() {
   const [period, setPeriod] = useState<PeriodKey>("y2020");
   const { data, isLoading } = useDashboardLPK(period);
+  const [grafik, setGrafik] = useState<grafik>("bar");
   const { data: notifications } = useNotifications();
   const navigate = useNavigate();
 
@@ -27,7 +30,7 @@ export function DashboardLPK() {
           title="Dashboard Nasional Akreditasi LPK"
           subtitle="Memuat data..."
         />
-        <div className="flex-1 p-6 text-sm text-ink-faint">
+        <div className="flex-1 p-6 text-sm text-ink-faint bg-[#F4F7FA]">
           Memuat dashboard...
         </div>
       </>
@@ -58,7 +61,7 @@ export function DashboardLPK() {
         onPeriodChange={setPeriod}
       />
 
-      <div className="flex-1 space-y-6 p-6">
+      <div className="flex-1 space-y-6 p-6 bg-[#F4F7FA]">
         {/* Stat cards */}
         <div className="flex overflow-x-auto gap-2.5 snap-x snap-mandatory lg:grid lg:gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard
@@ -106,17 +109,41 @@ export function DashboardLPK() {
           </div>
         </div>
 
-        {/* Trend + top provinces */}
-        <div className="">
-          <Panel
-            title="Jumlah Lembaga Per Provinsi Top 5"
-            onMore={() => navigate("/modul/mod-lpk")}
-          >
-            <div className="space-y-3">
-              {/* delete the slice for all data shown */}
-              <ProvinceChart data={data.byProvinsi.slice(0, 5)} />
-            </div>
-          </Panel>
+        {/* Sebaran + top provinces */}
+        <div className="bg-white rounded-md">
+          <div className="flex gap-3 p-4">
+            <button
+              onClick={() => setGrafik("bar")}
+              className="btn btn-sm active:btn-accent"
+            >
+              Bar
+            </button>
+            <button
+              onClick={() => setGrafik("peta")}
+              className="btn btn-sm active:btn-accent"
+            >
+              Peta
+            </button>
+          </div>
+          {grafik === "bar" && (
+            <Panel
+              title="Jumlah Lembaga Per Provinsi Top 5"
+              onMore={() => navigate("/modul/mod-lpk")}
+            >
+              <div className="space-y-3">
+                {/* delete the slice for all data shown */}
+                <ProvinceChart data={data.byProvinsi.slice(0, 10)} />
+              </div>
+            </Panel>
+          )}
+          {grafik === "peta" && (
+            <Panel
+              title="Sebaran Lembaga Per Provinsi Indonesia"
+              onMore={() => navigate("/modul/mod-lpk")}
+            >
+              <MapIndonesia dataProvinsi={data.byProvinsi} />
+            </Panel>
+          )}
         </div>
 
         <div className="flex flex-col gap-1 pb-2 text-xs text-ink-faint sm:flex-row sm:items-center sm:justify-between">

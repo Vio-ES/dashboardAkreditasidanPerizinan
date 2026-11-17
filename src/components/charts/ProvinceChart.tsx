@@ -15,7 +15,7 @@ interface ProvinceChartProps {
 
 export function ProvinceChart({ data }: ProvinceChartProps) {
   return (
-    <div className="min-h-0 w-fit">
+    <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           layout="vertical"

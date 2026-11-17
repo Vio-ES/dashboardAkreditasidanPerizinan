@@ -70,6 +70,18 @@ export interface GrafikTahunRow {
   "Belum Ada Data": number;
 }
 
+export type LembagaFormData = {
+  vin: number;
+  nama_lembaga: string;
+  status: Status;
+  alamat: string;
+  provinsi: string;
+  kabupaten_kota: string;
+  status_akreditasi_kelembagaan: StatusAkreditasiLembaga;
+  tahun_akreditasi: number;
+  list_program: string[];
+};
+
 export interface DashboardData {
   period: PeriodKey;
   label: string;
@@ -210,7 +222,7 @@ export interface ModuleDefinition {
   navLabel: string;
   title: string;
   sub: string;
-  addLabel: string;
+  addLabel?: string;
   cols: string[];
   statusKey: string;
   icon: string; // lucide-react icon name

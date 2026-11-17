@@ -1,6 +1,6 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { DataTable } from "@/components/ui/DataTable";
 import { Modal } from "@/components/ui/Modal";
@@ -10,8 +10,12 @@ import { Pagination } from "@/components/ui/Pagination";
 import { fetchAllModuleRows } from "@/lib/api/modules";
 import { toCSV } from "@/lib/utils";
 import { LembagaForm } from "@/components/forms/LembagaForm";
+import { LembagaFormData } from "@/types";
+import { UserContext } from "@/lib/AuthContext";
 
 export function ModulePage() {
+  const role = useContext(UserContext);
+
   const { key = "" } = useParams();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -19,6 +23,7 @@ export function ModulePage() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const { showToast } = useToast();
+
   const createRow = useCreateModuleRow(key);
 
   useEffect(() => {
@@ -34,8 +39,8 @@ export function ModulePage() {
     );
   }
 
-  const handleSubmit = async () => {
-    //await createRow.mutateAsync({});
+  const handleSubmit = async (lembaga: LembagaFormData) => {
+    await createRow.mutateAsync(lembaga);
     setModalOpen(false);
     showToast("Berhasil disimpan");
   };
@@ -60,20 +65,22 @@ export function ModulePage() {
   return (
     <>
       <Topbar title={data.title} subtitle={data.sub} />
-      <div className="flex-1 space-y-4 p-6">
+      <div className="flex-1 space-y-4 p-6 bg-[#F4F7FA]">
         <div className="flex items-center justify-end gap-3">
-          <button
-            onClick={() => setModalOpen(true)}
-            className="flex items-center gap-2 rounded-lg bg-blue px-4 py-2 text-sm font-semibold text-white hover:bg-blue-dark"
-          >
-            <Plus size={16} />
-            {data.addLabel}
-          </button>
+          {data.addLabel && role === "admin" && (
+            <button
+              onClick={() => setModalOpen(true)}
+              className="flex items-center gap-2 rounded-lg bg-blue px-4 py-2 text-sm font-semibold text-white hover:bg-blue-dark"
+            >
+              <Plus size={16} />
+              {data.addLabel}
+            </button>
+          )}
           <button
             onClick={() => handleDownload()}
             className="flex items-center gap-2 rounded-lg bg-blue px-4 py-2 text-sm font-semibold text-white hover:bg-blue-dark"
           >
-            <Plus size={16} />
+            <Download size={16} />
             Unduh CSV
           </button>
         </div>
@@ -92,13 +99,14 @@ export function ModulePage() {
         />
       </div>
 
-      <Modal
-        open={modalOpen}
-        title={data.addLabel}
-        onClose={() => setModalOpen(false)}
-      >
-        <LembagaForm onSuccess={() => setModalOpen(false)} />
-        {/** <p className="mb-4 text-sm text-ink-soft">
+      {data.addLabel && (
+        <Modal
+          open={modalOpen}
+          title={data.addLabel}
+          onClose={() => setModalOpen(false)}
+        >
+          <LembagaForm onSubmit={handleSubmit} />
+          {/** <p className="mb-4 text-sm text-ink-soft">
           Formulir ini adalah placeholder — sambungkan ke endpoint{" "}
           <code className="text-xs">POST /api/modules/{key}</code> di{" "}
           <code className="text-xs">src/lib/api/modules.ts</code> saat backend
@@ -111,7 +119,8 @@ export function ModulePage() {
         >
           {createRow.isPending ? "Menyimpan..." : "Simpan"}
         </button>**/}
-      </Modal>
+        </Modal>
+      )}
     </>
   );
 }
