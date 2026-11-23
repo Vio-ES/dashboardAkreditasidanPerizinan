@@ -1,5 +1,15 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createModuleRow, fetchModuleData, fetchModuleDefinitions } from "@/lib/api/modules";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  createModuleRow,
+  fetchModuleData,
+  fetchModuleDefinitions,
+} from "@/lib/api/modules";
+import { ModuleFilters } from "@/types";
 
 export function useModuleDefinitions() {
   return useQuery({
@@ -8,12 +18,16 @@ export function useModuleDefinitions() {
   });
 }
 
-export function useModuleData(key: string, page: number,
-pageSize: number) {
+export function useModuleData(
+  key: string,
+  page: number,
+  pageSize: number,
+  filters: ModuleFilters,
+) {
   return useQuery({
-    queryKey: ["module", key, page, pageSize],
-    queryFn: () => fetchModuleData(key, page, pageSize),
-    placeholderData:keepPreviousData,
+    queryKey: ["module", key, page, pageSize, filters],
+    queryFn: () => fetchModuleData(key, page, pageSize, filters),
+    placeholderData: keepPreviousData,
     enabled: Boolean(key),
   });
 }
@@ -21,7 +35,8 @@ pageSize: number) {
 export function useCreateModuleRow(key: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: Record<string, unknown>) => createModuleRow(key, payload),
+    mutationFn: (payload: Record<string, unknown>) =>
+      createModuleRow(key, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["module", key] });
     },

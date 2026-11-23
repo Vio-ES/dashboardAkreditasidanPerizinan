@@ -5,7 +5,15 @@
 // not data) — only the rows and counts come from the database, via
 // the v_mod_* views defined in supabase-schema.sql.
 
-import type { ModuleData, ModuleDefinition, ModuleRow, SortRule } from "@/types";
+import {
+  STATUS_AKREDITASI_LEMBAGA_OPTIONS,
+  type FilterRule,
+  type ModuleData,
+  type ModuleDefinition,
+  type ModuleFilters,
+  type ModuleRow,
+  type SortRule,
+} from "@/types";
 import { supabase } from "@/lib/supabaseClient";
 import { getModuleDefinitions } from "@/data/staticData";
 
@@ -37,8 +45,19 @@ const TABLE_BY_KEY: Record<string, string> = {
 
 const SORT_BY_KEY: Record<string, SortRule[] | undefined> = {
   "mod-lpk": [
-  { column: "Tanggal Input", ascending: false },
-  { column: "Nama LPK", ascending: false },
+    { column: "Tanggal Input", ascending: false },
+    { column: "Nama LPK", ascending: false },
+  ],
+};
+
+const FILTERS_BY_KEY: Record<string, FilterRule[] | undefined> = {
+  "mod-lpk": [
+    {
+      column: "Status",
+      label: "Status",
+      options: STATUS_AKREDITASI_LEMBAGA_OPTIONS,
+    },
+    { column: "Tahun Akreditasi", label: "Tahun Akreditasi" },
   ],
 };
 
@@ -57,13 +76,17 @@ export async function fetchModuleDefinitions(): Promise<ModuleDefinition[]> {
         return def;
       }
       return { ...def, count: count ?? 0 };
-    })
+    }),
   );
   return withCounts;
 }
 
-export async function fetchModuleData(key: string, page: number,
-pageSize: number): Promise<ModuleData> {
+export async function fetchModuleData(
+  key: string,
+  page: number,
+  pageSize: number,
+  filters: ModuleFilters,
+): Promise<ModuleData> {
   const definitions = getModuleDefinitions();
   const def = definitions.find((m: ModuleDefinition) => m.key === key);
   const view = VIEW_BY_KEY[key];
@@ -72,18 +95,31 @@ pageSize: number): Promise<ModuleData> {
   const from = pageSize * page - pageSize;
   const to = from + pageSize - 1;
 
-  let query = supabase
-    .from(view)
-    .select("*", { count: "exact" });
-    const rules = SORT_BY_KEY[key] ?? [];
-  for (const rule of rules) {
-    query = query.order(rule.column, { ascending: rule.ascending, nullsFirst: false });
+  let query = supabase.from(view).select("*", { count: "exact" });
+  const sortRules = SORT_BY_KEY[key] ?? [];
+  for (const rule of sortRules) {
+    query = query.order(rule.column, {
+      ascending: rule.ascending,
+      nullsFirst: false,
+    });
+  }
+
+  const filterRules = FILTERS_BY_KEY[key] ?? [];
+  for (const filterRule of filterRules) {
+    const value = filters[filterRule.column];
+    if (value !== null && value !== undefined)
+      query = query.eq(filterRule.column, value);
   }
 
   const { data, error, count } = await query.range(from, to);
   if (error) throw new Error(`Failed to load ${key}: ${error.message}`);
 
-  return { ...def, rows: (data ?? []) as ModuleRow[], count: count ?? 0  };
+  return {
+    ...def,
+    rows: (data ?? []) as ModuleRow[],
+    count: count ?? 0,
+    filterRules: filterRules,
+  };
 }
 
 export async function fetchAllModuleRows(key: string): Promise<ModuleRow[]> {
@@ -91,28 +127,29 @@ export async function fetchAllModuleRows(key: string): Promise<ModuleRow[]> {
   const view = VIEW_BY_KEY[key];
   if (!view) throw new Error(`Unknown module: ${key}`);
 
-  let query = supabase
-    .from(view)
-    .select("*");
-    const rules = SORT_BY_KEY[key] ?? [];
-  for (const rule of rules) {
-    query = query.order(rule.column, { ascending: rule.ascending, nullsFirst: false });
+  let query = supabase.from(view).select("*");
+  const sortRules = SORT_BY_KEY[key] ?? [];
+  for (const rule of sortRules) {
+    query = query.order(rule.column, {
+      ascending: rule.ascending,
+      nullsFirst: false,
+    });
   }
 
   const { data, error } = await query;
   if (error) throw new Error(`Failed to load ${key}: ${error.message}`);
 
-  return (data ?? []) as ModuleRow[]  ;
+  return (data ?? []) as ModuleRow[];
 }
 
 export async function createModuleRow(
   key: string,
-  payload: Record<string, unknown>
+  payload: Record<string, unknown>,
 ): Promise<void> {
   const table = TABLE_BY_KEY[key];
   if (!table) {
     throw new Error(
-      `No writable table mapped for module "${key}" yet — add it to TABLE_BY_KEY.`
+      `No writable table mapped for module "${key}" yet — add it to TABLE_BY_KEY.`,
     );
   }
   // NOTE: payload here is whatever the "Tambah Data" form collects,
@@ -122,5 +159,6 @@ export async function createModuleRow(
   // chosen LPK name) before inserting — that logic belongs here,
   // not in the UI component.
   const { error } = await supabase.from(table).insert(payload);
-  if (error) throw new Error(`Failed to create row in ${table}: ${error.message}`);
+  if (error)
+    throw new Error(`Failed to create row in ${table}: ${error.message}`);
 }

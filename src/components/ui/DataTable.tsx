@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
-import type { ModuleRow } from "@/types";
+import type { FilterRule, ModuleFilters, ModuleRow } from "@/types";
 import { Badge } from "./Badge";
 import { fmt } from "@/lib/utils";
 
@@ -10,6 +10,9 @@ interface DataTableProps {
   rows: ModuleRow[];
   statusKey: string;
   moduleKey: string;
+  filterRules: FilterRule[];
+  filters: ModuleFilters;
+  onFilterChange: (column: string, value: string | number | null) => void;
 }
 
 export function DataTable({
@@ -17,15 +20,12 @@ export function DataTable({
   rows,
   statusKey,
   moduleKey,
+  filterRules,
+  filters,
+  onFilterChange,
 }: DataTableProps) {
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
   const navigate = useNavigate();
-
-  const statusOptions = useMemo(
-    () => Array.from(new Set(rows.map((r) => String(r[statusKey])))),
-    [rows, statusKey],
-  );
 
   const filtered = useMemo(() => {
     return rows.filter((row) => {
@@ -34,11 +34,18 @@ export function DataTable({
         Object.values(row).some((v) =>
           String(v).toLowerCase().includes(search.toLowerCase()),
         );
-      const matchesStatus =
-        statusFilter === "" || String(row[statusKey]) === statusFilter;
-      return matchesSearch && matchesStatus;
+      return matchesSearch;
     });
-  }, [rows, search, statusFilter, statusKey]);
+  }, [rows, search]);
+
+  console.log(
+    "rows:",
+    rows.length,
+    "filtered:",
+    filtered.length,
+    "filters:",
+    filters,
+  );
 
   return (
     <div className="rounded-card bg-card shadow-card">
@@ -55,18 +62,26 @@ export function DataTable({
             className="w-full rounded-lg border border-line py-2 pl-9 pr-3 text-sm outline-none focus:border-border"
           />
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-border sm:w-56"
-        >
-          <option value="">Semua Status</option>
-          {statusOptions.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+        {filterRules.map((filterRule) => (
+          <select
+            key={filterRule.column}
+            value={filters[filterRule.column] ?? ""}
+            onChange={(e) =>
+              onFilterChange(
+                filterRule.column,
+                e.target.value === "" ? null : e.target.value,
+              )
+            }
+            className="rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-border sm:w-56"
+          >
+            <option value="">Semua</option>
+            {filterRule.options?.map((ops) => (
+              <option key={ops} value={ops}>
+                {ops}
+              </option>
+            ))}
+          </select>
+        ))}
       </div>
 
       <div className="overflow-x-auto">
