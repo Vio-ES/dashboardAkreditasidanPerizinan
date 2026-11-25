@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import type { FilterRule, ModuleFilters, ModuleRow } from "@/types";
 import { Badge } from "./Badge";
 import { fmt } from "@/lib/utils";
+import { FilterSelect } from "./FilterSelect";
 
 interface DataTableProps {
   cols: string[];
@@ -38,14 +39,16 @@ export function DataTable({
     });
   }, [rows, search]);
 
-  console.log(
-    "rows:",
-    rows.length,
-    "filtered:",
-    filtered.length,
-    "filters:",
-    filters,
-  );
+  // console.log(
+  //   "rows:",
+  //   rows.length,
+  //   "filtered:",
+  //   filtered.length,
+  //   "filters:",
+  //   filters,
+  // );
+
+  // console.log(filterRules[1].column + "check");
 
   return (
     <div className="rounded-card bg-card shadow-card">
@@ -62,37 +65,42 @@ export function DataTable({
             className="w-full rounded-lg border border-line py-2 pl-9 pr-3 text-sm outline-none focus:border-border"
           />
         </div>
-        {filterRules.map((filterRule) => (
-          <select
+        {/* {filterRules.map((filterRule) => (
+          <FilterSelect
             key={filterRule.column}
+            moduleKey={moduleKey}
+            column={filterRule.column}
             value={filters[filterRule.column] ?? ""}
-            onChange={(e) =>
-              onFilterChange(
-                filterRule.column,
-                e.target.value === "" ? null : e.target.value,
-              )
-            }
-            className="rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-border sm:w-56"
-          >
-            <option value="">Semua</option>
-            {filterRule.options?.map((ops) => (
-              <option key={ops} value={ops}>
-                {ops}
-              </option>
-            ))}
-          </select>
-        ))}
+            options={filterRule.options}
+            onFilterChange={onFilterChange}
+          />
+        ))} */}
       </div>
 
       <div className="overflow-x-auto">
         <table className="table table-xs">
           <thead>
             <tr className="border-b border-line text-xs font-semibold uppercase tracking-wide text-ink-faint">
-              {cols.map((c) => (
-                <th key={c} className="whitespace-nowrap px-4 py-3">
-                  {c}
-                </th>
-              ))}
+              {cols.map((c) => {
+                const filterRule = filterRules.find((f) => f.column === c);
+                return (
+                  <th key={c} className="whitespace-nowrap px-4 py-3 ">
+                    {filterRule ? (
+                      <FilterSelect
+                        key={filterRule.column}
+                        moduleKey={moduleKey}
+                        column={filterRule.column}
+                        value={filters[filterRule.column] ?? ""}
+                        options={filterRule.options}
+                        onFilterChange={onFilterChange}
+                        placeholder={filterRule.label}
+                      />
+                    ) : (
+                      c
+                    )}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>

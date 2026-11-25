@@ -30,7 +30,6 @@ export function LembagaForm({ onSubmit }: LembagaFormProps) {
   const { data: provinces = [] } = useProvinces();
   const selectedProvince = provinces.find((p) => p.nama === formData.provinsi);
   const { data: kabupatenList = [] } = useKabupatenKota(selectedProvince?.id);
-  console.log(kabupatenList);
 
   const handleChange = (
     e: React.ChangeEvent<

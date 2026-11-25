@@ -122,8 +122,26 @@ export async function fetchModuleData(
   };
 }
 
+export async function fetchFilterOptions(key: string, column: string) {
+  const view = VIEW_BY_KEY[key];
+
+  if (!view) throw new Error(`Unknown module: ${key}`);
+
+  const query = supabase.from(view).select(`"${column}"`);
+
+  const { data, error } = await query;
+  if (error) throw new Error(`Failed to load ${key}: ${error.message}`);
+
+  const rows = (data ?? []) as unknown as ModuleRow[];
+  const filteredRows = Array.from(new Set(rows.map((r) => r[column]))).filter(
+    (r) => r != null && r !== "-",
+  );
+  return filteredRows.sort((a, b) =>
+    b.toString().localeCompare(a.toString(), undefined, { numeric: true }),
+  );
+}
+
 export async function fetchAllModuleRows(key: string): Promise<ModuleRow[]> {
-  const definitions = getModuleDefinitions();
   const view = VIEW_BY_KEY[key];
   if (!view) throw new Error(`Unknown module: ${key}`);
 
