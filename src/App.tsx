@@ -62,7 +62,7 @@ export default function App() {
           .select("role")
           .eq("id", session.user.id)
           .single();
-        console.log(data, error);
+        // console.log(data, error);
         setRole(data?.role ?? null);
       } catch (error) {
         console.error("Failed to fetch data:", error);

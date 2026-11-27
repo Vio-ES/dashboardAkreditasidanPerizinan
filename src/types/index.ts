@@ -26,6 +26,13 @@ export const STATUS_AKREDITASI_LEMBAGA_OPTIONS = [
 export type StatusAkreditasiLembaga =
   (typeof STATUS_AKREDITASI_LEMBAGA_OPTIONS)[number];
 
+export interface ModuleFilterss {
+  tahun: number | null;
+  status: StatusAkreditasiLembaga | "";
+}
+
+export type ModuleFilters = Record<string, string | number | null>;
+
 export type PeriodKey =
   | "mei2026"
   | "apr2026"
@@ -232,6 +239,13 @@ export interface ModuleDefinition {
 
 export interface ModuleData extends ModuleDefinition {
   rows: ModuleRow[];
+  filterRules: FilterRule[];
 }
 
 export type SortRule = { column: string; ascending: boolean };
+
+export type FilterRule = {
+  column: string;
+  label: string;
+  options?: readonly string[];
+};

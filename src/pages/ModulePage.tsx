@@ -10,7 +10,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { fetchAllModuleRows } from "@/lib/api/modules";
 import { toCSV } from "@/lib/utils";
 import { LembagaForm } from "@/components/forms/LembagaForm";
-import { LembagaFormData } from "@/types";
+import { LembagaFormData, ModuleFilters } from "@/types";
 import { UserContext } from "@/lib/AuthContext";
 
 export function ModulePage() {
@@ -19,7 +19,8 @@ export function ModulePage() {
   const { key = "" } = useParams();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const { data, isLoading } = useModuleData(key, page, pageSize);
+  const [filters, setFilters] = useState<ModuleFilters>({});
+  const { data, isLoading } = useModuleData(key, page, pageSize, filters);
 
   const [modalOpen, setModalOpen] = useState(false);
   const { showToast } = useToast();
@@ -28,7 +29,7 @@ export function ModulePage() {
 
   useEffect(() => {
     setPage(1);
-  }, [key, pageSize]);
+  }, [key, pageSize, filters]);
 
   if (isLoading || !data) {
     return (
@@ -62,6 +63,13 @@ export function ModulePage() {
     setPage(page);
   };
 
+  const handleFilterChange = (
+    column: string,
+    value: string | number | null,
+  ) => {
+    setFilters({ ...filters, [column]: value });
+  };
+
   return (
     <>
       <Topbar title={data.title} subtitle={data.sub} />
@@ -90,6 +98,9 @@ export function ModulePage() {
           rows={data.rows}
           statusKey={data.statusKey}
           moduleKey={key}
+          filterRules={data.filterRules}
+          filters={filters}
+          onFilterChange={handleFilterChange}
         />
         <Pagination
           page={page}
